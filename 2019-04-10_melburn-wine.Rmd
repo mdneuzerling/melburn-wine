@@ -49,6 +49,8 @@ wine %>%
 ## Points
 
 .pull-left[
+Wine is rated from 80 to 100 *points*:
+
 ```{r wine_point_histogram, eval=FALSE}
 red_wine_colour <- "#59121C"
 white_wine_colour <- "#EADB9F"
@@ -66,6 +68,8 @@ wine %>% ggplot(aes(x = points)) +
     fill = red_wine_colour
   )
 ```
+
+Thanks to Deanna Neuzerling for the colour scheme!
 ]
 
 .pull-right[
