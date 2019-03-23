@@ -1,0 +1,115 @@
+---
+title: "LIME Wine"
+subtitle: "Melbourne Users of R Network (MelbURN)"
+author: "@mdneuzerling"
+date: "2019/04/10"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      ratio: "16:9"
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+## Data load
+
+```{r setup, include=FALSE}
+library(tidyverse)
+```
+
+.pull-left[
+```{r wine_data_load, message=FALSE, warning=FALSE, cache=TRUE}
+wine <- "winemag-data-130k-v2.csv" %>% 
+  read_csv %>%
+  mutate(
+    variety = variety %>% tolower,
+    # missing data filled from description
+    variety = ifelse(
+      X1 == 86909, 
+      "petite syrah", 
+      variety
+    ) 
+  )
+```
+
+```{r wine_vis_dat, eval=FALSE}
+wine %>% 
+    sample_n(30000) %>% 
+    visdat::vis_dat()
+```
+]
+
+.pull-right[
+```{r wine_vis_dat_out, ref.label="wine_vis_dat", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
+```
+]
+
+---
+## Points
+
+.pull-left[
+```{r wine_point_histogram, eval=FALSE}
+red_wine_colour <- "#59121C"
+white_wine_colour <- "#EADB9F"
+rose_wine_colour <- "#F5C0A2"
+wine_colours <- c(
+  "red" = red_wine_colour, 
+  "white" = white_wine_colour, 
+  "rose" = rose_wine_colour
+)
+
+wine %>% ggplot(aes(x = points)) + 
+  geom_histogram(
+    bins = nrow(wine %>% distinct(points)),
+    colour = white_wine_colour,
+    fill = red_wine_colour
+  )
+```
+]
+
+.pull-right[
+```{r wine_point_histogram_out, ref.label="wine_point_histogram", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
+```
+]
+
+---
+## This is what an 80-point wine is like
+
+A 1998 French red blend:
+
+.pull-left[
+```{r grandma_wine, eval=FALSE}
+wine %>% 
+    filter(X1 == 11086) %>% 
+    select(description) %>% 
+    paste0('> ', .) %>% # print as quote
+    cat
+```
+]
+
+.pull-right[
+```{r grandma_wine_out, ref.label="grandma_wine", echo=FALSE, results='asis'}
+```
+]
+
+---
+## Tennis balls?
+
+Tennis balls are mentioned in `r wine %>% filter(grepl("tennis ball", description)) %>% nrow` wine reviews. This Californian sauvignon blanc got 88 points:
+
+.pull-left[
+```{r tennis_ball_wine, eval=FALSE}
+wine %>% 
+    filter(X1 == 12834) %>% 
+    select(description) %>% 
+    paste0('> ', .) %>% # print as quote
+    cat
+```
+]
+
+.pull-right[
+```{r tennis_ball_wine_out, ref.label="tennis_ball_wine", echo=FALSE, results='asis'}
+```
+]
+
