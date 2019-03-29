@@ -2,7 +2,7 @@
 title: "LIME Wine"
 subtitle: "Melbourne Users of R Network (MelbURN)"
 author: "@mdneuzerling"
-date: "2019/04/10"
+date: "2019-04-10"
 output:
   xaringan::moon_reader:
     lib_dir: libs
