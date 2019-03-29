@@ -159,7 +159,7 @@ wiki_tables &lt;- wiki_url %&gt;% read_html %&gt;% html_nodes("table")
 red_wines &lt;- wiki_tables[[2]] %&gt;% html_table %&gt;% cbind(colour = "red")
 white_wines &lt;- wiki_tables[[3]] %&gt;% html_table %&gt;% cbind(colour = "white")
 rose_wines &lt;- wiki_tables[[4]] %&gt;% html_table %&gt;% cbind(colour = "rose")
-all_wines &lt;- rbind(red_wines, white_wines, rose_wines) %&gt;% mutate_all(as.character)
+all_wines &lt;- rbind(red_wines, white_wines, rose_wines)
 ```
 
 ---
@@ -170,8 +170,7 @@ class: left
 all_wines %&gt;% 
   select(`Common Name(s)`, `All Synonyms`, colour) %&gt;% 
   head(5) %&gt;% 
-  knitr::kable(format = "html") %&gt;% 
-  kableExtra::kable_styling(full_width = F)
+  output_table
 ```
 
 &lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;

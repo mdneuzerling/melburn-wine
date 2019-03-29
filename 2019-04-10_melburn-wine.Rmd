@@ -16,7 +16,15 @@ class: left
 ## Data load
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache = TRUE)
+
 library(tidyverse)
+
+# nifty function for making our table output pretty
+output_table <- function(dat) {
+  knitr::kable(dat, format = "html") %>% 
+  kableExtra::kable_styling(full_width = F)
+}
 ```
 
 .pull-left[
@@ -34,7 +42,7 @@ wine <- "winemag-data-130k-v2.csv" %>%
   )
 ```
 
-```{r wine_vis_dat, eval=FALSE}
+```{r wine_vis_dat, eval=FALSE, cache=TRUE}
 wine %>% 
     sample_n(30000) %>% 
     visdat::vis_dat()
@@ -143,7 +151,7 @@ class: left
 class: left
 ## Scraping Wikipedia
 
-```{r grape_colours_wiki_scrape, message = FALSE}
+```{r grape_colours_wiki_scrape, message = FALSE, cache = TRUE}
 library(rvest)
 # Use an old revision of the article for consistency
 wiki_url <- "https://en.wikipedia.org/w/index.php?title=List_of_grape_varieties&oldid=847983339"
@@ -151,7 +159,7 @@ wiki_tables <- wiki_url %>% read_html %>% html_nodes("table")
 red_wines <- wiki_tables[[2]] %>% html_table %>% cbind(colour = "red")
 white_wines <- wiki_tables[[3]] %>% html_table %>% cbind(colour = "white")
 rose_wines <- wiki_tables[[4]] %>% html_table %>% cbind(colour = "rose")
-all_wines <- rbind(red_wines, white_wines, rose_wines) %>% mutate_all(as.character)
+all_wines <- rbind(red_wines, white_wines, rose_wines)
 ```    
 
 ---
@@ -161,6 +169,16 @@ class: left
 all_wines %>% 
   select(`Common Name(s)`, `All Synonyms`, colour) %>% 
   head(5) %>% 
-  knitr::kable(format = "html") %>% 
-  kableExtra::kable_styling(full_width = F)
+  output_table
 ```
+
+
+
+
+
+
+
+
+
+
+
