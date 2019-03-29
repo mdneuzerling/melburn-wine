@@ -7,6 +7,7 @@
     <meta name="date" content="2019-04-10" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
   </head>
   <body>
     <textarea id="source">
@@ -19,7 +20,7 @@ class: center, middle, inverse, title-slide
 
 ---
 
-class: center
+class: left
 ## Data load
 
 
@@ -53,7 +54,7 @@ wine %&gt;%
 ]
 
 ---
-class: center
+class: left
 ## Points
 
 .pull-left[
@@ -86,7 +87,7 @@ Thanks to Deanna Neuzerling for the colour scheme!
 ]
 
 ---
-class: center
+class: left
 ## This is what an 80-point wine is like
 
 A 1998 French red blend:
@@ -107,7 +108,7 @@ wine %&gt;%
 ]
 
 ---
-class: center
+class: left
 ## Tennis balls?
 
 Tennis balls are mentioned in 7 wine reviews. This Californian sauvignon blanc got 88 points:
@@ -128,12 +129,87 @@ wine %&gt;%
 ]
 
 ---
-class: center
+class: left
 ## Red or white?
 
 I like red wine. I don't like white wine.
 
-&lt;img src="wine-tasting-notes.jpg" alt="the top half of a page of wine tasting notes. The white wines are noted as tasting white. There are no notes for the red wines." style="width: 55%; height: 55%;"&gt;&lt;/img&gt;
+&lt;center&gt;
+&lt;img src="wine-tasting-notes.jpg" alt="The top half of a page of wine tasting notes. The white wines are noted as tasting white. There are no notes for the red wines." style="width: 55%; height: 55%;"&gt;&lt;/img&gt;
+&lt;/center&gt;
+
+---
+class: left
+## Scraping Wikipedia
+
+&lt;center&gt;
+&lt;img src="wine-table.png" alt="A screenshot of a table on Wikipedia. The visible columns are the common name of the grape, the synonyms of the grape, and the country of origin. Some of the grapes have a large number of synonyms." style="width: 70%; height: 70%;"&gt;&lt;/img&gt;
+&lt;/center&gt;
+
+---
+class: left
+## Scraping Wikipedia
+
+
+```r
+library(rvest)
+# Use an old revision of the article for consistency
+wiki_url &lt;- "https://en.wikipedia.org/w/index.php?title=List_of_grape_varieties&amp;oldid=847983339"
+wiki_tables &lt;- wiki_url %&gt;% read_html %&gt;% html_nodes("table")
+red_wines &lt;- wiki_tables[[2]] %&gt;% html_table %&gt;% cbind(colour = "red")
+white_wines &lt;- wiki_tables[[3]] %&gt;% html_table %&gt;% cbind(colour = "white")
+rose_wines &lt;- wiki_tables[[4]] %&gt;% html_table %&gt;% cbind(colour = "rose")
+all_wines &lt;- rbind(red_wines, white_wines, rose_wines) %&gt;% mutate_all(as.character)
+```
+
+---
+class: left
+## Scraping Wikipedia
+
+```r
+all_wines %&gt;% 
+  select(`Common Name(s)`, `All Synonyms`, colour) %&gt;% 
+  head(5) %&gt;% 
+  knitr::kable(format = "html") %&gt;% 
+  kableExtra::kable_styling(full_width = F)
+```
+
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Common Name(s) &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; All Synonyms &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; colour &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Abbuoto &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Aboto, Cecubo. &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; red &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Abouriou &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beaujolais, Early Burgunder, Early Burgundy, Gamay Beaujolais, Gamay du Rhône, Gamay St-Laurent, Malbec Argente Negret de la Canourgue, Noir Hatif, Plant Abouriou, Plant Précoce, Précoce Naugé, Précoce Noir, Pressac de Bourgogne. &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; red &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Aladasturi &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anadastouri, Anadassaouli &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; red &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alexandroouli &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Aleksandroouly, Aleksandrouli, Aleksandrouli shavi, Alexandreouli, Alexandreuli, Alexandroouli, Alexandrouly, Alexsandrouli, Kabistona, Kabistoni. &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; red &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Akhasheni &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Akhashenuli &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; red &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

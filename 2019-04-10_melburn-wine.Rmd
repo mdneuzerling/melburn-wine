@@ -12,7 +12,7 @@ output:
       highlightLines: true
       countIncrementalSlides: false
 ---
-class: center
+class: left
 ## Data load
 
 ```{r setup, include=FALSE}
@@ -47,7 +47,7 @@ wine %>%
 ]
 
 ---
-class: center
+class: left
 ## Points
 
 .pull-left[
@@ -80,7 +80,7 @@ Thanks to Deanna Neuzerling for the colour scheme!
 ]
 
 ---
-class: center
+class: left
 ## This is what an 80-point wine is like
 
 A 1998 French red blend:
@@ -101,7 +101,7 @@ wine %>%
 ]
 
 ---
-class: center
+class: left
 ## Tennis balls?
 
 Tennis balls are mentioned in `r wine %>% filter(grepl("tennis ball", description)) %>% nrow` wine reviews. This Californian sauvignon blanc got 88 points:
@@ -122,9 +122,45 @@ wine %>%
 ]
 
 ---
-class: center
+class: left
 ## Red or white?
 
 I like red wine. I don't like white wine.
 
-<img src="wine-tasting-notes.jpg" alt="the top half of a page of wine tasting notes. The white wines are noted as tasting white. There are no notes for the red wines." style="width: 55%; height: 55%;"></img>
+<center>
+<img src="wine-tasting-notes.jpg" alt="The top half of a page of wine tasting notes. The white wines are noted as tasting white. There are no notes for the red wines." style="width: 55%; height: 55%;"></img>
+</center>
+
+---
+class: left
+## Scraping Wikipedia
+
+<center>
+<img src="wine-table.png" alt="A screenshot of a table on Wikipedia. The visible columns are the common name of the grape, the synonyms of the grape, and the country of origin. Some of the grapes have a large number of synonyms." style="width: 70%; height: 70%;"></img>
+</center>
+
+---
+class: left
+## Scraping Wikipedia
+
+```{r grape_colours_wiki_scrape, message = FALSE}
+library(rvest)
+# Use an old revision of the article for consistency
+wiki_url <- "https://en.wikipedia.org/w/index.php?title=List_of_grape_varieties&oldid=847983339"
+wiki_tables <- wiki_url %>% read_html %>% html_nodes("table")
+red_wines <- wiki_tables[[2]] %>% html_table %>% cbind(colour = "red")
+white_wines <- wiki_tables[[3]] %>% html_table %>% cbind(colour = "white")
+rose_wines <- wiki_tables[[4]] %>% html_table %>% cbind(colour = "rose")
+all_wines <- rbind(red_wines, white_wines, rose_wines) %>% mutate_all(as.character)
+```    
+
+---
+class: left
+## Scraping Wikipedia
+```{r grape_colours_wiki_scrape_head}
+all_wines %>% 
+  select(`Common Name(s)`, `All Synonyms`, colour) %>% 
+  head(5) %>% 
+  knitr::kable(format = "html") %>% 
+  kableExtra::kable_styling(full_width = F)
+```
