@@ -63,11 +63,11 @@ Wine is rated from 80 to 100 *points*:
 ```r
 red_wine_colour &lt;- "#59121C"
 white_wine_colour &lt;- "#EADB9F"
-rose_wine_colour &lt;- "#F5C0A2"
+rosé_wine_colour &lt;- "#F5C0A2"
 wine_plot_colours &lt;- c(
   "red" = red_wine_colour, 
-  "white" = white_wine_colour, 
-  "rose" = rose_wine_colour
+  "white" = white_wine_colour,
+  "rosé" = rosé_wine_colour
 )
 
 wine %&gt;% ggplot(aes(x = points)) + 
@@ -155,9 +155,8 @@ wine &lt;- wine %&gt;% left_join(
 wine %&gt;% 
   ggplot(aes(x = colour, fill = colour)) + 
   geom_bar() + 
-  scale_fill_manual(values = 
-    wine_plot_colours,
-    na.value = "grey"
+  scale_fill_manual(
+    values = wine_plot_colours
   ) + 
   ggtitle("Wine colours") +
   theme(legend.position="none")
