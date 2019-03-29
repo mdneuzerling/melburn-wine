@@ -87,6 +87,39 @@ Thanks to Deanna Neuzerling for the colour scheme!
 
 ---
 class: left
+## Wine colours
+
+.pull-left[
+Scraping wine colours with R:
+[https://mdneuzerling.com/post/scraping-wine-colours-with-r/](https://mdneuzerling.com/post/scraping-wine-colours-with-r/)
+
+
+```r
+wine &lt;- wine %&gt;% left_join(
+  read_csv("variety_colours.csv"),
+  by = "variety"
+)
+```
+
+
+```r
+wine %&gt;% 
+  ggplot(aes(x = colour, fill = colour)) + 
+  geom_bar() + 
+  scale_fill_manual(
+    values = wine_plot_colours
+  ) + 
+  ggtitle("Wine colours") +
+  theme(legend.position="none")
+```
+]
+
+.pull-right[
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_colours_plot_out-1.png" width="500" height="500" /&gt;
+]
+
+---
+class: left
 ## This is what an 80-point wine is like
 
 A 1998 French red blend:
@@ -136,36 +169,6 @@ I like red wine. I don't like white wine.
 &lt;center&gt;
 &lt;img src="wine-tasting-notes.jpg" alt="The top half of a page of wine tasting notes. The white wines are noted as tasting white. There are no notes for the red wines." style="width: 55%; height: 55%;"&gt;&lt;/img&gt;
 &lt;/center&gt;
-
----
-class: left
-## Wine colours
-
-.pull-left[
-
-```r
-wine &lt;- wine %&gt;% left_join(
-  read_csv("variety_colours.csv"),
-  by = "variety"
-)
-```
-
-
-```r
-wine %&gt;% 
-  ggplot(aes(x = colour, fill = colour)) + 
-  geom_bar() + 
-  scale_fill_manual(
-    values = wine_plot_colours
-  ) + 
-  ggtitle("Wine colours") +
-  theme(legend.position="none")
-```
-]
-
-.pull-right[
-&lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_colours_plot_out-1.png" width="500" height="500" /&gt;
-]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
