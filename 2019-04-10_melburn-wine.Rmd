@@ -138,3 +138,39 @@ I like red wine. I don't like white wine.
 <center>
 <img src="wine-tasting-notes.jpg" alt="The top half of a page of wine tasting notes. The white wines are noted as tasting white. There are no notes for the red wines." style="width: 55%; height: 55%;"></img>
 </center>
+
+---
+class: left
+## Wine colours
+
+.pull-left[
+```{r joining_with_variety_colours, message=FALSE}
+wine <- wine %>% left_join(
+  read_csv("variety_colours.csv"),
+  by = "variety"
+)
+```
+
+```{r wine_colours_plot, eval=FALSE}
+wine %>% 
+  ggplot(aes(x = colour, fill = colour)) + 
+  geom_bar() + 
+  scale_fill_manual(values = 
+    wine_plot_colours,
+    na.value = "grey"
+  ) + 
+  ggtitle("Wine colours") +
+  theme(legend.position="none")
+```
+]
+
+.pull-right[
+```{r wine_colours_plot_out, ref.label="wine_colours_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
+```
+]
+
+
+
+
+
+
