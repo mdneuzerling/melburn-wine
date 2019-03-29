@@ -65,7 +65,7 @@ Wine is rated from 80 to 100 *points*:
 red_wine_colour <- "#59121C"
 white_wine_colour <- "#EADB9F"
 rose_wine_colour <- "#F5C0A2"
-wine_colours <- c(
+wine_plot_colours <- c(
   "red" = red_wine_colour, 
   "white" = white_wine_colour, 
   "rose" = rose_wine_colour
@@ -138,47 +138,3 @@ I like red wine. I don't like white wine.
 <center>
 <img src="wine-tasting-notes.jpg" alt="The top half of a page of wine tasting notes. The white wines are noted as tasting white. There are no notes for the red wines." style="width: 55%; height: 55%;"></img>
 </center>
-
----
-class: left
-## Scraping Wikipedia
-
-<center>
-<img src="wine-table.png" alt="A screenshot of a table on Wikipedia. The visible columns are the common name of the grape, the synonyms of the grape, and the country of origin. Some of the grapes have a large number of synonyms." style="width: 70%; height: 70%;"></img>
-</center>
-
----
-class: left
-## Scraping Wikipedia
-
-```{r grape_colours_wiki_scrape, message = FALSE, cache = TRUE}
-library(rvest)
-# Use an old revision of the article for consistency
-wiki_url <- "https://en.wikipedia.org/w/index.php?title=List_of_grape_varieties&oldid=847983339"
-wiki_tables <- wiki_url %>% read_html %>% html_nodes("table")
-red_wines <- wiki_tables[[2]] %>% html_table %>% cbind(colour = "red")
-white_wines <- wiki_tables[[3]] %>% html_table %>% cbind(colour = "white")
-rose_wines <- wiki_tables[[4]] %>% html_table %>% cbind(colour = "rose")
-all_wines <- rbind(red_wines, white_wines, rose_wines)
-```    
-
----
-class: left
-## Scraping Wikipedia
-```{r grape_colours_wiki_scrape_head}
-all_wines %>% 
-  select(`Common Name(s)`, `All Synonyms`, colour) %>% 
-  head(5) %>% 
-  output_table
-```
-
-
-
-
-
-
-
-
-
-
-
