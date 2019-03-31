@@ -91,6 +91,17 @@ Thanks to Deanna Neuzerling for the colour scheme!
 class: left
 ## Wine colours
 
+I like red wine. I don't like white wine.
+
+<center>
+<img src="wine-tasting-notes.jpg" alt="The top half of a page of wine tasting notes. The white wines are noted as tasting white. There are no notes for the red wines." style="width: 55%; height: 55%;"></img>
+</center>
+
+
+---
+class: left
+## Wine colours
+
 .pull-left[
 Scraping wine colours with R:
 [https://mdneuzerling.com/post/scraping-wine-colours-with-r/](https://mdneuzerling.com/post/scraping-wine-colours-with-r/)
@@ -161,15 +172,6 @@ wine %>%
 ```
 ]
 
----
-class: left
-## Red or white?
-
-I like red wine. I don't like white wine.
-
-<center>
-<img src="wine-tasting-notes.jpg" alt="The top half of a page of wine tasting notes. The white wines are noted as tasting white. There are no notes for the red wines." style="width: 55%; height: 55%;"></img>
-</center>
 
 
 
