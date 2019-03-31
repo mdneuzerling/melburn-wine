@@ -7,6 +7,7 @@
     <meta name="date" content="2019-04-10" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
   </head>
   <body>
     <textarea id="source">
@@ -19,7 +20,6 @@ class: center, middle, inverse, title-slide
 
 ---
 
-class: left
 ## Data load
 
 
@@ -29,11 +29,12 @@ class: left
 ```r
 wine &lt;- "winemag-data-130k-v2.csv" %&gt;% 
   read_csv %&gt;%
+  rename(index = X1) %&gt;% 
   mutate(
     variety = variety %&gt;% tolower,
     # missing data filled from description
     variety = ifelse(
-      X1 == 86909, 
+      index == 86909, 
       "petite syrah", 
       variety
     ) 
@@ -53,7 +54,6 @@ wine %&gt;%
 ]
 
 ---
-class: left
 ## Points
 
 .pull-left[
@@ -86,7 +86,16 @@ Thanks to Deanna Neuzerling for the colour scheme!
 ]
 
 ---
-class: left
+## Wine colours
+
+I like red wine. I don't like white wine.
+
+&lt;center&gt;
+&lt;img src="wine-tasting-notes.jpg" alt="The top half of a page of wine tasting notes. The white wines are noted as tasting white. There are no notes for the red wines." style="width: 55%; height: 55%;"&gt;&lt;/img&gt;
+&lt;/center&gt;
+
+
+---
 ## Wine colours
 
 .pull-left[
@@ -119,7 +128,6 @@ wine %&gt;%
 ]
 
 ---
-class: left
 ## This is what an 80-point wine is like
 
 A 1998 French red blend:
@@ -128,7 +136,7 @@ A 1998 French red blend:
 
 ```r
 wine %&gt;% 
-    filter(X1 == 11086) %&gt;% 
+    filter(index == 11086) %&gt;% 
     select(description) %&gt;% 
     paste0('&gt; ', .) %&gt;% # print as quote
     cat
@@ -140,7 +148,6 @@ wine %&gt;%
 ]
 
 ---
-class: left
 ## Tennis balls?
 
 Tennis balls are mentioned in 7 wine reviews. This Californian sauvignon blanc got 88 points:
@@ -149,7 +156,7 @@ Tennis balls are mentioned in 7 wine reviews. This Californian sauvignon blanc g
 
 ```r
 wine %&gt;% 
-    filter(X1 == 12834) %&gt;% 
+    filter(index == 12834) %&gt;% 
     select(description) %&gt;% 
     paste0('&gt; ', .) %&gt;% # print as quote
     cat
@@ -161,14 +168,133 @@ wine %&gt;%
 ]
 
 ---
-class: left
-## Red or white?
+## Word frequency
 
-I like red wine. I don't like white wine.
+.pull-left[
 
-&lt;center&gt;
-&lt;img src="wine-tasting-notes.jpg" alt="The top half of a page of wine tasting notes. The white wines are noted as tasting white. There are no notes for the red wines." style="width: 55%; height: 55%;"&gt;&lt;/img&gt;
-&lt;/center&gt;
+```r
+wine_words &lt;- wine %&gt;% 
+  tidytext::unnest_tokens(
+    word, 
+    description
+  ) %&gt;% 
+  anti_join(
+    tidytext::stop_words, 
+    by = "word") 
+```
+
+
+```r
+wine_words %&gt;% 
+  select(index, word) %&gt;% 
+  head(10) %&gt;% 
+  output_table
+```
+]
+
+.pull-right[
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; index &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; word &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; aromas &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; include &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; tropical &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; fruit &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; broom &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; brimstone &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; dried &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; herb &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; palate &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; overly &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+## Word frequency
+
+.pull-left[
+
+```r
+wine_words %&gt;%
+  count(word, colour, sort = TRUE) %&gt;%
+  head(20) %&gt;%
+  mutate(word = reorder(word, n)) %&gt;%
+  ggplot(aes(word, n, fill = colour)) +
+  geom_col() + 
+  scale_fill_manual(
+    values = wine_plot_colours
+  ) +
+  ggtitle("Wine 1-grams") + 
+  xlab(NULL) +
+  theme(text = element_text(size = 16)) +
+  coord_flip() +
+  theme(legend.position="none")
+```
+]
+
+.pull-right[
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_1grams_plot_out-1.png" width="500" height="500" /&gt;
+]
+
+---
+## Word frequency
+
+.pull-left[
+I'm not sure what purpose word clouds serve, but they seem compulsory at this point.
+
+
+```r
+wine_words %&gt;%
+  count(word) %&gt;%
+  with(
+    wordcloud::wordcloud(
+      word, 
+      n, 
+      max.words = 100
+    )
+  )
+```
+]
+
+.pull-right[
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/word_cloud_out-1.png" width="500" height="500" /&gt;
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

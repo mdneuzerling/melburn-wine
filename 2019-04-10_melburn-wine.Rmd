@@ -12,7 +12,6 @@ output:
       highlightLines: true
       countIncrementalSlides: false
 ---
-class: left
 ## Data load
 
 ```{r setup, include=FALSE}
@@ -31,11 +30,12 @@ output_table <- function(dat) {
 ```{r wine_data_load, message=FALSE, warning=FALSE, cache=TRUE}
 wine <- "winemag-data-130k-v2.csv" %>% 
   read_csv %>%
+  rename(index = X1) %>% 
   mutate(
     variety = variety %>% tolower,
     # missing data filled from description
     variety = ifelse(
-      X1 == 86909, 
+      index == 86909, 
       "petite syrah", 
       variety
     ) 
@@ -55,7 +55,6 @@ wine %>%
 ]
 
 ---
-class: left
 ## Points
 
 .pull-left[
@@ -88,7 +87,6 @@ Thanks to Deanna Neuzerling for the colour scheme!
 ]
 
 ---
-class: left
 ## Wine colours
 
 I like red wine. I don't like white wine.
@@ -99,7 +97,6 @@ I like red wine. I don't like white wine.
 
 
 ---
-class: left
 ## Wine colours
 
 .pull-left[
@@ -131,7 +128,6 @@ wine %>%
 ]
 
 ---
-class: left
 ## This is what an 80-point wine is like
 
 A 1998 French red blend:
@@ -139,7 +135,7 @@ A 1998 French red blend:
 .pull-left[
 ```{r grandma_wine, eval=FALSE}
 wine %>% 
-    filter(X1 == 11086) %>% 
+    filter(index == 11086) %>% 
     select(description) %>% 
     paste0('> ', .) %>% # print as quote
     cat
@@ -152,7 +148,6 @@ wine %>%
 ]
 
 ---
-class: left
 ## Tennis balls?
 
 Tennis balls are mentioned in `r wine %>% filter(grepl("tennis ball", description)) %>% nrow` wine reviews. This Californian sauvignon blanc got 88 points:
@@ -160,7 +155,7 @@ Tennis balls are mentioned in `r wine %>% filter(grepl("tennis ball", descriptio
 .pull-left[
 ```{r tennis_ball_wine, eval=FALSE}
 wine %>% 
-    filter(X1 == 12834) %>% 
+    filter(index == 12834) %>% 
     select(description) %>% 
     paste0('> ', .) %>% # print as quote
     cat
@@ -172,11 +167,81 @@ wine %>%
 ```
 ]
 
+---
+## Word frequency
 
+.pull-left[
+```{r wine_words, cache=TRUE}
+wine_words <- wine %>% 
+  tidytext::unnest_tokens(
+    word, 
+    description
+  ) %>% 
+  anti_join(
+    tidytext::stop_words, 
+    by = "word") 
+```
 
+```{r wine_words_head, eval=FALSE}
+wine_words %>% 
+  select(index, word) %>% 
+  head(10) %>% 
+  output_table
+```
+]
 
+.pull-right[
+```{r wine_words_head_out, ref.label="wine_words_head", echo=FALSE}
+```
+]
 
+---
+## Word frequency
 
+.pull-left[
+```{r wine_1grams_plot, eval=FALSE}
+wine_words %>%
+  count(word, colour, sort = TRUE) %>%
+  head(20) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n, fill = colour)) +
+  geom_col() + 
+  scale_fill_manual(
+    values = wine_plot_colours
+  ) +
+  ggtitle("Wine 1-grams") + 
+  xlab(NULL) +
+  theme(text = element_text(size = 16)) +
+  coord_flip() +
+  theme(legend.position="none")
+```
+]
 
+.pull-right[
+```{r wine_1grams_plot_out, ref.label="wine_1grams_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
+```
+]
 
+---
+## Word frequency
 
+.pull-left[
+I'm not sure what purpose word clouds serve, but they seem compulsory at this point.
+
+```{r word_cloud, eval=FALSE}
+wine_words %>%
+  count(word) %>%
+  with(
+    wordcloud::wordcloud(
+      word, 
+      n, 
+      max.words = 100
+    )
+  )
+```
+]
+
+.pull-right[
+```{r word_cloud_out, ref.label="word_cloud", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
+```
+]
