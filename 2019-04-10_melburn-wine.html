@@ -180,19 +180,20 @@ wine_words &lt;- wine %&gt;%
   ) %&gt;% 
   anti_join(
     tidytext::stop_words, 
-    by = "word") 
-```
-
-
-```r
-wine_words %&gt;% 
-  select(index, word) %&gt;% 
-  head(10) %&gt;% 
-  output_table
+    by = "word"
+  ) 
 ```
 ]
 
 .pull-right[
+
+```r
+wine_words %&gt;% 
+  select(index, word) %&gt;% 
+  head %&gt;% 
+  output_table
+```
+
 &lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
  &lt;thead&gt;
   &lt;tr&gt;
@@ -225,22 +226,6 @@ wine_words %&gt;%
    &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; brimstone &lt;/td&gt;
   &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; dried &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; herb &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; palate &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; overly &lt;/td&gt;
-  &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 ]
@@ -260,10 +245,10 @@ wine_words %&gt;%
   scale_fill_manual(
     values = wine_plot_colours
   ) +
-  ggtitle("Wine 1-grams") + 
   xlab(NULL) +
   theme(text = element_text(size = 16)) +
   coord_flip() +
+  ggtitle("Frequency of words") +
   theme(legend.position="none")
 ```
 ]
@@ -294,6 +279,119 @@ wine_words %&gt;%
 
 .pull-right[
 &lt;img src="2019-04-10_melburn-wine_files/figure-html/word_cloud_out-1.png" width="500" height="500" /&gt;
+]
+
+---
+## 2-gram frequency
+
+.pull-left[
+
+```r
+wine_2grams &lt;- wine %&gt;%  
+  tidytext::unnest_tokens(
+    ngram, 
+    description, 
+    token = "ngrams", 
+    n = 2
+  ) %&gt;% 
+  separate(
+    ngram, 
+    c("word1", "word2"), 
+    sep = " ", 
+    remove = FALSE
+  ) %&gt;% 
+  filter_at(
+    vars(starts_with("word")), 
+    all_vars(
+      !(. %in% tidytext::stop_words$word)
+    )
+  )
+```
+]
+
+.pull-right[
+
+```r
+wine_2grams %&gt;% 
+  select(index, ngram, word1, word2) %&gt;% 
+  head %&gt;% 
+  output_table
+```
+
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; index &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; ngram &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; word1 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; word2 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; aromas include &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; aromas &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; include &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; include tropical &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; include &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; tropical &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; tropical fruit &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; tropical &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; fruit &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; fruit broom &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; fruit &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; broom &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; broom brimstone &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; broom &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; brimstone &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; dried herb &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; dried &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; herb &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+## 2-gram frequency
+
+.pull-left[
+
+```r
+wine_2grams %&gt;%
+  count(ngram, colour, sort = TRUE) %&gt;%
+  head(20) %&gt;%
+  mutate(ngram = reorder(ngram, n)) %&gt;%
+  ggplot(aes(ngram, n, fill = colour)) +
+  geom_col() +
+  scale_fill_manual(
+    values = wine_plot_colours
+  ) +
+  xlab(NULL) +
+  coord_flip() + 
+  ggtitle("Frequency of 2-grams") +
+  theme(legend.position="none")
+```
+]
+
+.pull-right[
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_2grams_plot_out-1.png" width="500" height="500" /&gt;
 ]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

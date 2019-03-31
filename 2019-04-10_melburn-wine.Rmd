@@ -179,19 +179,17 @@ wine_words <- wine %>%
   ) %>% 
   anti_join(
     tidytext::stop_words, 
-    by = "word") 
-```
-
-```{r wine_words_head, eval=FALSE}
-wine_words %>% 
-  select(index, word) %>% 
-  head(10) %>% 
-  output_table
+    by = "word"
+  ) 
 ```
 ]
 
 .pull-right[
-```{r wine_words_head_out, ref.label="wine_words_head", echo=FALSE}
+```{r wine_words_head}
+wine_words %>% 
+  select(index, word) %>% 
+  head %>% 
+  output_table
 ```
 ]
 
@@ -209,10 +207,10 @@ wine_words %>%
   scale_fill_manual(
     values = wine_plot_colours
   ) +
-  ggtitle("Wine 1-grams") + 
   xlab(NULL) +
   theme(text = element_text(size = 16)) +
   coord_flip() +
+  ggtitle("Frequency of words") +
   theme(legend.position="none")
 ```
 ]
@@ -243,5 +241,67 @@ wine_words %>%
 
 .pull-right[
 ```{r word_cloud_out, ref.label="word_cloud", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
+```
+]
+
+---
+## 2-gram frequency
+
+.pull-left[
+```{r 2grams, cache=TRUE}
+wine_2grams <- wine %>%  
+  tidytext::unnest_tokens(
+    ngram, 
+    description, 
+    token = "ngrams", 
+    n = 2
+  ) %>% 
+  separate(
+    ngram, 
+    c("word1", "word2"), 
+    sep = " ", 
+    remove = FALSE
+  ) %>% 
+  filter_at(
+    vars(starts_with("word")), 
+    all_vars(
+      !(. %in% tidytext::stop_words$word)
+    )
+  )
+```
+]
+
+.pull-right[
+```{r 2grams_head}
+wine_2grams %>% 
+  select(index, ngram, word1, word2) %>% 
+  head %>% 
+  output_table
+```
+]
+
+---
+## 2-gram frequency
+
+.pull-left[
+```{r wine_2grams_plot, eval=FALSE}
+wine_2grams %>%
+  count(ngram, colour, sort = TRUE) %>%
+  head(20) %>%
+  mutate(ngram = reorder(ngram, n)) %>%
+  ggplot(aes(ngram, n, fill = colour)) +
+  geom_col() +
+  scale_fill_manual(
+    values = wine_plot_colours
+  ) +
+  xlab(NULL) +
+  coord_flip() + 
+  ggtitle("Frequency of 2-grams") +
+  theme(legend.position="none")
+```
+]
+
+.pull-right[
+```{r wine_2grams_plot_out, ref.label="wine_2grams_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
 ```
 ]
