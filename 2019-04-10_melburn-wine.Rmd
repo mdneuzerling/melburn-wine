@@ -87,6 +87,7 @@ Thanks to Deanna Neuzerling for the colour scheme!
 ]
 
 ---
+class: inverse
 ## Wine colours
 
 I like red wine. I don't like white wine.
@@ -305,3 +306,4 @@ wine_2grams %>%
 ```{r wine_2grams_plot_out, ref.label="wine_2grams_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
 ```
 ]
+
