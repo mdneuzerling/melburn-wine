@@ -409,6 +409,48 @@ We'll be loosely following [Shirin Glander's](https://shirinsplayground.netlify.
 --
 
 We need a function that maps an **arbitrary string** onto this vector space.
+
+---
+## Tokenizer
+
+.pull-left[
+
+```r
+stem_tokeniser &lt;- function(x) {
+    lapply(
+        text2vec::word_tokenizer(x), 
+        SnowballC::wordStem, 
+        language = "en"
+    )
+}
+```
+]
+
+.pull-right[
+
+```r
+stem_tokeniser(
+  "Dreaming sufficient identical usually"
+)
+```
+
+```
+## [[1]]
+## [1] "Dream"   "suffici" "ident"   "usual"
+```
+
+
+```r
+stem_tokeniser(
+  "information informed informing informs"
+)
+```
+
+```
+## [[1]]
+## [1] "inform" "inform" "inform" "inform"
+```
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

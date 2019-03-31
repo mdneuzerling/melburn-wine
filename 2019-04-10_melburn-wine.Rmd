@@ -321,3 +321,32 @@ We'll be loosely following [Shirin Glander's](https://shirinsplayground.netlify.
 --
 
 We need a function that maps an **arbitrary string** onto this vector space.
+
+---
+## Tokenizer
+
+.pull-left[
+```{r stem_tokeniser}
+stem_tokeniser <- function(x) {
+    lapply(
+        text2vec::word_tokenizer(x), 
+        SnowballC::wordStem, 
+        language = "en"
+    )
+}
+```
+]
+
+.pull-right[
+```{r stem_tokeniser_example_1}
+stem_tokeniser(
+  "Dreaming sufficient identical usually"
+)
+```
+
+```{r stem_tokeniser_example_2}
+stem_tokeniser(
+  "information informed informing informs"
+)
+```
+]
