@@ -394,6 +394,21 @@ wine_2grams %&gt;%
 .pull-right[
 &lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_2grams_plot_out-1.png" width="500" height="500" /&gt;
 ]
+
+---
+class: inverse
+## Vectorising
+
+We'll be loosely following [Shirin Glander's](https://shirinsplayground.netlify.com/2018/07/explaining_ml_models_code_text_lime/) approach to preprocessing here, which identifies the following four steps:
+
+1. remove stop words 
+1. stem the tokens 
+1. prune the vocabulary 
+1. transform into a vector space 
+
+--
+
+We need a function that maps an **arbitrary string** onto this vector space.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
