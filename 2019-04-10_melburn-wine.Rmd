@@ -211,7 +211,7 @@ wine_words %>%
   theme(text = element_text(size = 16)) +
   coord_flip() +
   ggtitle("Frequency of words") +
-  theme(legend.position="none")
+  theme(legend.position = "none")
 ```
 ]
 
@@ -297,7 +297,7 @@ wine_2grams %>%
   xlab(NULL) +
   coord_flip() + 
   ggtitle("Frequency of 2-grams") +
-  theme(legend.position="none")
+  theme(legend.position = "none")
 ```
 ]
 
