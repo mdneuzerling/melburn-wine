@@ -480,13 +480,41 @@ vocabulary &lt;- text2vec::create_vocabulary(
 .pull-right[
 
 ```r
-vocabulary$Vocabulary
+vocabulary
 ```
 
 ```
-## NULL
+## Number of docs: 129971 
+## 1149 stopwords: a, a's, able, about, above, according ... 
+## ngram_min = 1; ngram_max = 1 
+## Vocabulary: 
+##            term term_count doc_count
+##   1:    graphit       1306      1300
+##   2:      anoth       1310      1301
+##   3: honeysuckl       1315      1307
+##   4:      excel       1326      1302
+##   5:     brambl       1331      1327
+##  ---                                
+## 359:        dri      26516     24436
+## 360:      black      29050     24481
+## 361:       ripe      29141     27234
+## 362:     tannin      32980     31959
+## 363:     cherri      33589     31328
 ```
 ]
+
+---
+class: inverse
+# Vectoriser
+
+Our `vectoriser` will take an arbitrary string and map it to these 363 stemmed terms. 
+
+Any new terms will be **ignored**.
+
+
+```r
+vectoriser &lt;- vocabulary %&gt;% text2vec::vocab_vectorizer()
+```
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

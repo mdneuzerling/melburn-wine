@@ -377,6 +377,18 @@ vocabulary <- text2vec::create_vocabulary(
 
 .pull-right[
 ```{r vocabulary_out}
-vocabulary$Vocabulary
+vocabulary
 ```
 ]
+
+---
+class: inverse
+# Vectoriser
+
+Our `vectoriser` will take an arbitrary string and map it to these `r length(vocabulary$term)` stemmed terms. 
+
+Any new terms will be **ignored**.
+
+```{r vectoriser}
+vectoriser <- vocabulary %>% text2vec::vocab_vectorizer()
+```
