@@ -452,6 +452,41 @@ stem_tokeniser(
 ## [1] "inform" "inform" "inform" "inform"
 ```
 ]
+
+---
+## Generate a vocabulary, remove stop words and prune
+
+.pull-left[
+
+```r
+wine_tokens &lt;- text2vec::itoken(
+  wine$description, 
+  preprocessor = tolower, 
+  tokenizer = stem_tokeniser,
+  progressbar = FALSE
+)
+
+vocabulary &lt;- text2vec::create_vocabulary(
+  wine_tokens, 
+  stopwords = tidytext::stop_words$word
+) %&gt;% 
+  text2vec::prune_vocabulary(
+    doc_proportion_min = 0.01,
+    doc_proportion_max = 0.25
+  )
+```
+]
+
+.pull-right[
+
+```r
+vocabulary$Vocabulary
+```
+
+```
+## NULL
+```
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
