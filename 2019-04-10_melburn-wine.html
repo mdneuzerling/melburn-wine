@@ -69,7 +69,10 @@ wine_plot_colours &lt;- c(
   "white" = white_wine_colour,
   "rosé" = rosé_wine_colour
 )
+```
 
+
+```r
 wine %&gt;% ggplot(aes(x = points)) + 
   geom_histogram(
     bins = nrow(wine %&gt;% distinct(points)),
@@ -505,7 +508,7 @@ vocabulary
 
 ---
 class: inverse
-# Vectoriser
+## Vectoriser
 
 Our `vectoriser` will take an arbitrary string and map it to these 363 stemmed terms. 
 
@@ -515,6 +518,139 @@ Any new terms will be **ignored**.
 ```r
 vectoriser &lt;- vocabulary %&gt;% text2vec::vocab_vectorizer()
 ```
+
+---
+## Document term matrices
+
+* Every column is one of our 363 terms
+* Every row is a wine review
+* Values are weighted by *term frequency–inverse document frequency (tf-idf)*
+
+
+```r
+map_to_dtm &lt;- function(text, vectorizer = vectoriser) {
+  vocab &lt;- text2vec::itoken(
+    text, 
+    preprocess_function = tolower, 
+    tokenizer = stem_tokeniser,
+    progressbar = FALSE)
+
+  dtm &lt;- text2vec::create_dtm(vocab, vectorizer = vectorizer)
+
+  tfidf = text2vec::TfIdf$new()
+  text2vec::fit_transform(dtm, tfidf)
+}
+```
+
+---
+## Document term matrices
+
+
+```r
+wine_dtm &lt;- wine$description %&gt;% map_to_dtm
+wine_dtm %&gt;% dim
+```
+
+```
+## [1] 129971    363
+```
+
+
+```r
+paste0('&gt; ', wine[1,]$description) %&gt;% cat
+```
+
+&gt; Aromas include tropical fruit, broom, brimstone and dried herb. The palate isn't overly expressive, offering unripened apple, citrus and dried sage alongside brisk acidity.
+
+
+```r
+tail(wine_dtm[1,], 20)
+```
+
+```
+##      soft      appl    textur     offer     sweet      plum     light 
+## 0.0000000 0.1886876 0.0000000 0.1767235 0.0000000 0.0000000 0.0000000 
+##      nose       oak     berri       red     fresh      rich     spice 
+## 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 
+##      note       dri     black      ripe    tannin    cherri 
+## 0.0000000 0.2891878 0.0000000 0.0000000 0.0000000 0.0000000
+```
+
+---
+## xgboost
+
+
+```r
+xgb &lt;- xgboost::xgb.train(
+  list(
+    max_depth = 7, 
+    eta = 0.1, 
+    objective = "reg:linear",
+    eval_metric = "rmse"
+  ),
+  data = xgboost::xgb.DMatrix(
+    wine_dtm, 
+    label = wine$points
+  ),
+  nrounds = 1000
+)
+```
+
+---
+## LIME
+
+.pull-left[
+
+```r
+wine_explainer &lt;- lime::lime(
+  wine$description,
+  xgb,
+  preprocess = map_to_dtm
+)
+```
+]
+
+.pull-right[
+
+&gt;There once was a package called lime,
+
+&gt;Whose models were simply sublime,
+
+&gt;It gave explanations for their variations,
+
+&gt;one observation at a time.
+
+*lime-rick* by Mara Averick
+]
+
+&lt;center&gt;
+&lt;img src="lime-logo.png" alt="The logo for the lime package for R. It's a green hexagonal logo that looks like the inside of a lime fruit." style="width: 18%; height: 18%;"&gt;&lt;/img&gt;
+&lt;/center&gt;
+
+---
+## LIME
+
+.pull-left[
+
+```r
+sample_wine &lt;- wine %&gt;% 
+  filter(index == 71573)
+sample_wine_explanation &lt;- lime::explain(
+  sample_wine$description,
+  wine_explainer,
+  n_features = 10
+)
+
+paste0("&gt; ", sample_wine$description) %&gt;% 
+  cat
+```
+
+&gt; Rich and creamy, showing tangerine, apricot, buttered toast, cinnamon spice and herb flavors. A solid wine for drinking with roast salmon, seared tuna or a salad of bitter greens with goat cheese and orange slices.
+]
+
+.pull-right[
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/xgb_explanation_plot-1.png" width="500" height="500" /&gt;
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
