@@ -400,6 +400,19 @@ wine_2grams %&gt;%
 
 ---
 class: inverse
+## Train and test
+
+We're about to do some modelling, so let's prepare our train and test sets.
+
+
+```r
+wine_split &lt;- rsample::initial_split(wine, strata = "colour", p = 0.80)
+wine_train &lt;- rsample::training(wine_split)
+wine_test &lt;- rsample::testing(wine_split)
+```
+
+---
+class: inverse
 ## Vectorising
 
 We'll be loosely following [Shirin Glander's](https://shirinsplayground.netlify.com/2018/07/explaining_ml_models_code_text_lime/) approach to preprocessing here, which identifies the following steps:
@@ -462,15 +475,15 @@ stem_tokeniser(
 .pull-left[
 
 ```r
-wine_tokens &lt;- text2vec::itoken(
-  wine$description, 
+wine_train_tokens &lt;- text2vec::itoken(
+  wine_train$description, 
   preprocessor = tolower, 
   tokenizer = stem_tokeniser,
   progressbar = FALSE
 )
 
 vocabulary &lt;- text2vec::create_vocabulary(
-  wine_tokens, 
+  wine_train_tokens, 
   stopwords = tidytext::stop_words$word
 ) %&gt;% 
   text2vec::prune_vocabulary(
@@ -487,22 +500,22 @@ vocabulary
 ```
 
 ```
-## Number of docs: 129971 
+## Number of docs: 103978 
 ## 1149 stopwords: a, a's, able, about, above, according ... 
 ## ngram_min = 1; ngram_max = 1 
 ## Vocabulary: 
 ##            term term_count doc_count
-##   1:    graphit       1306      1300
-##   2:      anoth       1310      1301
-##   3: honeysuckl       1315      1307
-##   4:      excel       1326      1302
-##   5:     brambl       1331      1327
+##   1: underbrush       1040      1040
+##   2:  highlight       1046      1043
+##   3:      anoth       1052      1044
+##   4:     brambl       1053      1049
+##   5:     friend       1062      1051
 ##  ---                                
-## 359:        dri      26516     24436
-## 360:      black      29050     24481
-## 361:       ripe      29141     27234
-## 362:     tannin      32980     31959
-## 363:     cherri      33589     31328
+## 361:        dri      21221     19527
+## 362:      black      23339     19669
+## 363:       ripe      23373     21841
+## 364:     tannin      26392     25594
+## 365:     cherri      26923     25104
 ```
 ]
 
@@ -510,7 +523,7 @@ vocabulary
 class: inverse
 ## Vectoriser
 
-Our `vectoriser` will take an arbitrary string and map it to these 363 stemmed terms. 
+Our `vectoriser` will take an arbitrary string and map it to these 365 stemmed terms. 
 
 Any new terms will be **ignored**.
 
@@ -522,38 +535,24 @@ vectoriser &lt;- vocabulary %&gt;% text2vec::vocab_vectorizer()
 ---
 ## Document term matrices
 
-* Every column is one of our 363 terms
+* Every column is one of our 365 terms
 * Every row is a wine review
 * Values are weighted by *term frequency–inverse document frequency (tf-idf)*
 
 
 ```r
-map_to_dtm &lt;- function(text, vectorizer = vectoriser) {
-  vocab &lt;- text2vec::itoken(
-    text, 
-    preprocess_function = tolower, 
-    tokenizer = stem_tokeniser,
-    progressbar = FALSE)
+wine_train_dtm &lt;- text2vec::create_dtm(wine_train_tokens, vectorizer = vectoriser)
+tfidf = text2vec::TfIdf$new()
+wine_train_dtm = tfidf$fit_transform(wine_train_dtm)
+dim(wine_train_dtm)
+```
 
-  dtm &lt;- text2vec::create_dtm(vocab, vectorizer = vectorizer)
-
-  tfidf = text2vec::TfIdf$new()
-  text2vec::fit_transform(dtm, tfidf)
-}
+```
+## [1] 103978    365
 ```
 
 ---
 ## Document term matrices
-
-
-```r
-wine_dtm &lt;- wine$description %&gt;% map_to_dtm
-wine_dtm %&gt;% dim
-```
-
-```
-## [1] 129971    363
-```
 
 
 ```r
@@ -564,16 +563,35 @@ paste0('&gt; ', wine[1,]$description) %&gt;% cat
 
 
 ```r
-tail(wine_dtm[1,], 20)
+tail(as.matrix(wine_train_dtm)[1,], 21)
 ```
 
 ```
-##      soft      appl    textur     offer     sweet      plum     light 
-## 0.0000000 0.1886876 0.0000000 0.1767235 0.0000000 0.0000000 0.0000000 
-##      nose       oak     berri       red     fresh      rich     spice 
+##    balanc      soft      appl    textur     offer     sweet     light 
 ## 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 
-##      note       dri     black      ripe    tannin    cherri 
-## 0.0000000 0.2891878 0.0000000 0.0000000 0.0000000 0.0000000
+##      plum      nose       oak     berri       red     fresh      rich 
+## 0.0000000 0.0000000 0.0000000 0.1663115 0.1582522 0.0000000 0.0000000 
+##     spice      note       dri     black      ripe    tannin    cherri 
+## 0.0000000 0.0000000 0.0000000 0.0000000 0.1300287 0.1168152 0.0000000
+```
+
+---
+## Mapping new data to a DTM
+
+The vocabulary and document frequency is determined **only** by the training set. If we get a new observation, it has to conform.
+
+```r
+map_to_dtm &lt;- function(text) {
+  tokens &lt;- text2vec::itoken(
+    text, 
+    preprocess_function = tolower, 
+    tokenizer = stem_tokeniser,
+    progressbar = FALSE
+  )
+
+  dtm &lt;- text2vec::create_dtm(tokens, vectoriser)
+  tfidf$transform(dtm) # transform uses the tfidf already fitted
+}
 ```
 
 ---
@@ -589,25 +607,21 @@ xgb &lt;- xgboost::xgb.train(
     eval_metric = "rmse"
   ),
   data = xgboost::xgb.DMatrix(
-    wine_dtm, 
-    label = wine$points
+    wine_train_dtm, 
+    label = wine_train$points
   ),
   nrounds = 1000
 )
 ```
 
 ---
+class: inverse
 ## LIME
 
 .pull-left[
-
-```r
-wine_explainer &lt;- lime::lime(
-  wine$description,
-  xgb,
-  preprocess = map_to_dtm
-)
-```
+&lt;center&gt;
+&lt;img src="lime-logo.png" alt="The logo for the lime package for R. It's a green hexagonal logo that looks like the inside of a lime fruit." style="width: 40%; height: 40%;"&gt;&lt;/img&gt;
+&lt;/center&gt;
 ]
 
 .pull-right[
@@ -623,9 +637,17 @@ wine_explainer &lt;- lime::lime(
 *lime-rick* by Mara Averick
 ]
 
-&lt;center&gt;
-&lt;img src="lime-logo.png" alt="The logo for the lime package for R. It's a green hexagonal logo that looks like the inside of a lime fruit." style="width: 18%; height: 18%;"&gt;&lt;/img&gt;
-&lt;/center&gt;
+---
+## LIME
+
+
+```r
+wine_explainer &lt;- lime::lime(
+  wine$description,
+  xgb,
+  preprocess = map_to_dtm
+)
+```
 
 ---
 ## LIME

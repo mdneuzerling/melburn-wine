@@ -313,6 +313,18 @@ wine_2grams %>%
 
 ---
 class: inverse
+## Train and test
+
+We're about to do some modelling, so let's prepare our train and test sets.
+
+```{r wine_split}
+wine_split <- rsample::initial_split(wine, strata = "colour", p = 0.80)
+wine_train <- rsample::training(wine_split)
+wine_test <- rsample::testing(wine_split)
+```
+
+---
+class: inverse
 ## Vectorising
 
 We'll be loosely following [Shirin Glander's](https://shirinsplayground.netlify.com/2018/07/explaining_ml_models_code_text_lime/) approach to preprocessing here, which identifies the following steps:
@@ -361,15 +373,15 @@ stem_tokeniser(
 
 .pull-left[
 ```{r vocabulary}
-wine_tokens <- text2vec::itoken(
-  wine$description, 
+wine_train_tokens <- text2vec::itoken(
+  wine_train$description, 
   preprocessor = tolower, 
   tokenizer = stem_tokeniser,
   progressbar = FALSE
 )
 
 vocabulary <- text2vec::create_vocabulary(
-  wine_tokens, 
+  wine_train_tokens, 
   stopwords = tidytext::stop_words$word
 ) %>% 
   text2vec::prune_vocabulary(
@@ -404,35 +416,40 @@ vectoriser <- vocabulary %>% text2vec::vocab_vectorizer()
 * Every row is a wine review
 * Values are weighted by *term frequency–inverse document frequency (tf-idf)*
 
-```{r map_to_dtm}
-map_to_dtm <- function(text, vectorizer = vectoriser) {
-  vocab <- text2vec::itoken(
-    text, 
-    preprocess_function = tolower, 
-    tokenizer = stem_tokeniser,
-    progressbar = FALSE)
-
-  dtm <- text2vec::create_dtm(vocab, vectorizer = vectorizer)
-
-  tfidf = text2vec::TfIdf$new()
-  text2vec::fit_transform(dtm, tfidf)
-}
+```{r wine_train_dtm}
+wine_train_dtm <- text2vec::create_dtm(wine_train_tokens, vectorizer = vectoriser)
+tfidf = text2vec::TfIdf$new()
+wine_train_dtm = tfidf$fit_transform(wine_train_dtm)
+dim(wine_train_dtm)
 ```
 
 ---
 ## Document term matrices
-
-```{r wine_dtm}
-wine_dtm <- wine$description %>% map_to_dtm
-wine_dtm %>% dim
-```
 
 ```{r wine_dtm_example_description, results='asis'}
 paste0('> ', wine[1,]$description) %>% cat
 ```
 
 ```{r wine_dtm_example_tail}
-tail(wine_dtm[1,], 20)
+tail(as.matrix(wine_train_dtm)[1,], 21)
+```
+
+---
+## Mapping new data to a DTM
+
+The vocabulary and document frequency is determined **only** by the training set. If we get a new observation, it has to conform.
+```{r map_to_dtm}
+map_to_dtm <- function(text) {
+  tokens <- text2vec::itoken(
+    text, 
+    preprocess_function = tolower, 
+    tokenizer = stem_tokeniser,
+    progressbar = FALSE
+  )
+
+  dtm <- text2vec::create_dtm(tokens, vectoriser)
+  tfidf$transform(dtm) # transform uses the tfidf already fitted
+}
 ```
 
 ---
@@ -447,24 +464,21 @@ xgb <- xgboost::xgb.train(
     eval_metric = "rmse"
   ),
   data = xgboost::xgb.DMatrix(
-    wine_dtm, 
-    label = wine$points
+    wine_train_dtm, 
+    label = wine_train$points
   ),
   nrounds = 1000
 )
 ```
 
 ---
+class: inverse
 ## LIME
 
 .pull-left[
-```{r wine_explainer, cache=TRUE}
-wine_explainer <- lime::lime(
-  wine$description,
-  xgb,
-  preprocess = map_to_dtm
-)
-```
+<center>
+<img src="lime-logo.png" alt="The logo for the lime package for R. It's a green hexagonal logo that looks like the inside of a lime fruit." style="width: 40%; height: 40%;"></img>
+</center>
 ]
 
 .pull-right[
@@ -480,9 +494,16 @@ wine_explainer <- lime::lime(
 *lime-rick* by Mara Averick
 ]
 
-<center>
-<img src="lime-logo.png" alt="The logo for the lime package for R. It's a green hexagonal logo that looks like the inside of a lime fruit." style="width: 18%; height: 18%;"></img>
-</center>
+---
+## LIME
+
+```{r wine_explainer, cache=TRUE}
+wine_explainer <- lime::lime(
+  wine$description,
+  xgb,
+  preprocess = map_to_dtm
+)
+```
 
 ---
 ## LIME
