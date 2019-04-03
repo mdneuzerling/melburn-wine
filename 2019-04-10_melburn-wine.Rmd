@@ -487,52 +487,71 @@ wine_explainer <- lime::lime(
 ---
 ## LIME
 
+```{r custom_lime_explanation_plot, include=FALSE}
+custom_lime_explanation_plot <- function(
+  explanation, wine, explainer = wine_explainer, n_features = 10
+) {
+  explanation %>% 
+    mutate(effect = ifelse(feature_weight >= 0, "positive", "negative")) %>% 
+    ggplot(aes(
+      x = reorder(feature_value, feature_weight), 
+      y = feature_weight,
+      fill = effect
+    )) +
+    geom_bar(stat = "identity") +
+    scale_fill_manual(
+      values = c(
+        "positive" = white_wine_colour, 
+        "negative" = red_wine_colour
+      )
+    ) +
+    coord_flip() +
+    labs(
+      title = paste0(
+        wine$variety,
+        ", ", wine$country,
+        ", ", wine$points, " points"
+      ),
+      subtitle = paste0(
+        "predicted: ", 
+        round(min(explanation$model_prediction), 1),
+        " points"
+      ),
+      x = "feature",
+      y = ""
+    ) +
+    theme(legend.position = "none")
+}
+```
+
 .pull-left[
-```{r xgb_explanation, results='asis'}
-sample_wine <- wine %>% 
-  filter(index == 71573)
+
+```{r sample_wine_description, results='asis', echo = FALSE}
+wine %>% 
+  filter(index == 71573) %>% 
+  pull(description) %>% 
+  paste0("> ", .) %>% 
+  cat
+```
+
+```{r xgb_explanation}
+sample_wine <- filter(wine, index == 71573)
 sample_wine_explanation <- lime::explain(
   sample_wine$description,
   wine_explainer,
   n_features = 10
 )
+```
 
-paste0("> ", sample_wine$description) %>% 
-  cat
+```{r sample_wine_explanation_plot, eval=FALSE}
+custom_lime_explanation_plot(
+  sample_wine_explanation, sample_wine
+)
 ```
 ]
 
 .pull-right[
-```{r xgb_explanation_plot, echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
-sample_wine_explanation %>% 
-  mutate(effect = ifelse(feature_weight >= 0, "positive", "negative")) %>% 
-  ggplot(aes(
-    x = reorder(feature_value, feature_weight), 
-    y = feature_weight,
-    fill = effect
-  )) +
-  geom_bar(stat = "identity") +
-  scale_fill_manual(
-    values = c(
-      "positive" = white_wine_colour, 
-      "negative" = red_wine_colour
-    )
-  ) +
-  coord_flip() +
-  labs(
-    title = paste0(
-      sample_wine$variety,
-      ", ", sample_wine$country,
-      ", ", sample_wine$points, " points"
-    ),
-    subtitle = paste0(
-      "predicted: ", 
-      round(min(sample_wine_explanation$model_prediction), 1),
-      " points"
-    ),
-    x = "feature",
-    y = ""
-  ) +
-  theme(legend.position = "none")
+```{r sample_wine_explanation_plot_out, ref.label="sample_wine_explanation_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
+
 ```
 ]

@@ -630,26 +630,32 @@ wine_explainer &lt;- lime::lime(
 ---
 ## LIME
 
+
+
 .pull-left[
 
+&gt; Rich and creamy, showing tangerine, apricot, buttered toast, cinnamon spice and herb flavors. A solid wine for drinking with roast salmon, seared tuna or a salad of bitter greens with goat cheese and orange slices.
+
+
 ```r
-sample_wine &lt;- wine %&gt;% 
-  filter(index == 71573)
+sample_wine &lt;- filter(wine, index == 71573)
 sample_wine_explanation &lt;- lime::explain(
   sample_wine$description,
   wine_explainer,
   n_features = 10
 )
-
-paste0("&gt; ", sample_wine$description) %&gt;% 
-  cat
 ```
 
-&gt; Rich and creamy, showing tangerine, apricot, buttered toast, cinnamon spice and herb flavors. A solid wine for drinking with roast salmon, seared tuna or a salad of bitter greens with goat cheese and orange slices.
+
+```r
+custom_lime_explanation_plot(
+  sample_wine_explanation, sample_wine
+)
+```
 ]
 
 .pull-right[
-&lt;img src="2019-04-10_melburn-wine_files/figure-html/xgb_explanation_plot-1.png" width="500" height="500" /&gt;
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/sample_wine_explanation_plot_out-1.png" width="500" height="500" /&gt;
 ]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
