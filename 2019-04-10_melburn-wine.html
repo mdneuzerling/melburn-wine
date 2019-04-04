@@ -488,7 +488,8 @@ vocabulary &lt;- text2vec::create_vocabulary(
   wine_train_tokens, 
   stopwords = c(
     tidytext::stop_words$word, 
-    "wine", "fruit", "flavour", "flavor"
+    "wine", "fruit", "flavour", "flavor",
+    "colour_red" # defined by the absence of white or rosé
   )
 ) %&gt;% 
   text2vec::prune_vocabulary(
@@ -663,11 +664,11 @@ wine_explainer &lt;- lime::lime(
 
 .pull-left[
 
-&gt; Fresh, creamy and tightly packed with stone fruit and melon, this lively Pinot Grigio would pair with appetizers or seafood. It boasts a soft, smooth finish with a touch of citrus acidity at the end. colour_white
+&gt; This is a solid and well-made Chardonnay, with notes of yellow apple, melon and fresh hay on the nose and mouth. There's a subtle astringency to the fruit flavors on the medium-weight palate, with bright acidity that carries through to the clean and refreshing finish. Drink now–2019. colour_white
 
 
 ```r
-wine_a &lt;- filter(wine, index == 17640)
+wine_a &lt;- filter(wine, index == 104742)
 wine_a_explanation &lt;- lime::explain(
   wine_a$description,
   wine_explainer,
@@ -678,7 +679,7 @@ wine_a_explanation &lt;- lime::explain(
 
 ```r
 custom_lime_explanation_plot(
-  wine_a_explanation, wine_a
+  wine_a_explanation, wine_a 
 )
 ```
 ]
@@ -692,11 +693,11 @@ custom_lime_explanation_plot(
 
 .pull-left[
 
-&gt; Pronounced dust, pollen and earth tones lend savoriness to this otherwise citrusy wine. Racy acidity and fresh tangerine and lemon flavors turn herbal on the finish. Drink now. colour_white
+&gt; Coconut, smoke and sweet aromas of cola, berry jam and fine tobacco make the bouquet inviting. In the mouth, it maintains freshness due to good acidity, while the flavors of earthy blackberry and plum come across dense and right. Firm and tannic on the finish; drink from 2012–2016. colour_red
 
 
 ```r
-wine_b &lt;- filter(wine, index == 85)
+wine_b &lt;- filter(wine, index == 51558)
 wine_b_explanation &lt;- lime::explain(
   wine_b$description,
   wine_explainer,
