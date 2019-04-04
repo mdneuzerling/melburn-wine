@@ -507,7 +507,7 @@ vocabulary
 
 ```
 ## Number of docs: 103978 
-## 1152 stopwords: a, a's, able, about, above, according ... 
+## 1154 stopwords: a, a's, able, about, above, according ... 
 ## ngram_min = 1; ngram_max = 1 
 ## Vocabulary: 
 ##             term term_count doc_count
@@ -517,11 +517,11 @@ vocabulary
 ##   4:      brambl       1053      1049
 ##   5:      friend       1062      1051
 ##  ---                                 
+## 369:        acid      31702     30714
 ## 370:      finish      32433     32118
 ## 371:       aroma      32913     32473
 ## 372: colour_whit      37342     37342
-## 373:      flavor      56882     52689
-## 374:    colour_r      63681     63681
+## 373:    colour_r      63681     63681
 ```
 ]
 
@@ -554,7 +554,7 @@ dim(wine_train_dtm)
 ```
 
 ```
-## [1] 103978    374
+## [1] 103978    373
 ```
 
 ---
@@ -573,13 +573,13 @@ tail(as.matrix(wine_train_dtm)[1,], 21)
 ```
 
 ```
-##        nose         oak       berri         red       fresh        rich 
-##  0.00000000  0.00000000  0.14255269  0.13564472  0.00000000  0.00000000 
-##       spice        note         dri       black        ripe      tannin 
-##  0.00000000  0.00000000  0.00000000  0.00000000  0.11145319  0.10012731 
-##      cherri       drink       palat        acid      finish       aroma 
-##  0.00000000  0.00000000  0.00000000  0.08710201  0.00000000  0.00000000 
-## colour_whit      flavor    colour_r 
+##        plum        nose         oak       berri         red       fresh 
+##  0.00000000  0.00000000  0.00000000  0.14255269  0.13564472  0.00000000 
+##        rich       spice        note         dri       black        ripe 
+##  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.11145319 
+##      tannin      cherri       drink       palat        acid      finish 
+##  0.10012731  0.00000000  0.00000000  0.00000000  0.08710201  0.00000000 
+##       aroma colour_whit    colour_r 
 ##  0.00000000  0.00000000  0.03501981
 ```
 
@@ -651,7 +651,7 @@ class: inverse
 
 ```r
 wine_explainer &lt;- lime::lime(
-  wine_train$description,
+  wine$description,
   xgb,
   preprocess = map_to_dtm
 )

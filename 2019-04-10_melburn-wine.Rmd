@@ -505,7 +505,7 @@ class: inverse
 
 ```{r wine_explainer, cache=TRUE}
 wine_explainer <- lime::lime(
-  wine_train$description,
+  wine$description,
   xgb,
   preprocess = map_to_dtm
 )
