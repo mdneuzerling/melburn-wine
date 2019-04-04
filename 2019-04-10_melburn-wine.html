@@ -406,6 +406,8 @@ We're about to do some modelling, so let's prepare our train and test sets.
 
 
 ```r
+wine &lt;- wine %&gt;% 
+  mutate(description = paste0(description, " colour_", colour))
 wine_split &lt;- rsample::initial_split(wine, strata = "colour", p = 0.80)
 wine_train &lt;- rsample::training(wine_split)
 wine_test &lt;- rsample::testing(wine_split)
@@ -486,7 +488,7 @@ vocabulary &lt;- text2vec::create_vocabulary(
   wine_train_tokens, 
   stopwords = c(
     tidytext::stop_words$word, 
-    "wine", "fruit", "flavour"
+    "wine", "fruit", "flavour", "flavor"
   )
 ) %&gt;% 
   text2vec::prune_vocabulary(
@@ -504,21 +506,21 @@ vocabulary
 
 ```
 ## Number of docs: 103978 
-## 1149 stopwords: a, a's, able, about, above, according ... 
+## 1152 stopwords: a, a's, able, about, above, according ... 
 ## ngram_min = 1; ngram_max = 1 
 ## Vocabulary: 
-##            term term_count doc_count
-##   1: underbrush       1040      1040
-##   2:  highlight       1046      1043
-##   3:      anoth       1052      1044
-##   4:     brambl       1053      1049
-##   5:     friend       1062      1051
-##  ---                                
-## 361:        dri      21221     19527
-## 362:      black      23339     19669
-## 363:       ripe      23373     21841
-## 364:     tannin      26392     25594
-## 365:     cherri      26923     25104
+##             term term_count doc_count
+##   1:  underbrush       1040      1040
+##   2:   highlight       1046      1043
+##   3:       anoth       1052      1044
+##   4:      brambl       1053      1049
+##   5:      friend       1062      1051
+##  ---                                 
+## 370:      finish      32433     32118
+## 371:       aroma      32913     32473
+## 372: colour_whit      37342     37342
+## 373:      flavor      56882     52689
+## 374:    colour_r      63681     63681
 ```
 ]
 
@@ -526,7 +528,7 @@ vocabulary
 class: inverse
 ## Vectoriser
 
-Our `vectoriser` will take an arbitrary string and map it to these 371 stemmed terms. 
+Our `vectoriser` will take an arbitrary string and map it to these 373 stemmed terms. 
 
 Any new terms will be **ignored**.
 
@@ -538,7 +540,7 @@ vectoriser &lt;- vocabulary %&gt;% text2vec::vocab_vectorizer()
 ---
 ## Document term matrices
 
-* Every column is one of our 371 terms
+* Every column is one of our 373 terms
 * Every row is a wine review
 * Values are weighted by *term frequency–inverse document frequency (tf-idf)*
 
@@ -551,7 +553,7 @@ dim(wine_train_dtm)
 ```
 
 ```
-## [1] 103978    365
+## [1] 103978    374
 ```
 
 ---
@@ -562,7 +564,7 @@ dim(wine_train_dtm)
 paste0('&gt; ', wine[1,]$description) %&gt;% cat
 ```
 
-&gt; Aromas include tropical fruit, broom, brimstone and dried herb. The palate isn't overly expressive, offering unripened apple, citrus and dried sage alongside brisk acidity.
+&gt; Aromas include tropical fruit, broom, brimstone and dried herb. The palate isn't overly expressive, offering unripened apple, citrus and dried sage alongside brisk acidity. colour_white
 
 
 ```r
@@ -570,12 +572,14 @@ tail(as.matrix(wine_train_dtm)[1,], 21)
 ```
 
 ```
-##    balanc      soft      appl    textur     offer     sweet     light 
-## 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 
-##      plum      nose       oak     berri       red     fresh      rich 
-## 0.0000000 0.0000000 0.0000000 0.1663115 0.1582522 0.0000000 0.0000000 
-##     spice      note       dri     black      ripe    tannin    cherri 
-## 0.0000000 0.0000000 0.0000000 0.0000000 0.1300287 0.1168152 0.0000000
+##        nose         oak       berri         red       fresh        rich 
+##  0.00000000  0.00000000  0.14255269  0.13564472  0.00000000  0.00000000 
+##       spice        note         dri       black        ripe      tannin 
+##  0.00000000  0.00000000  0.00000000  0.00000000  0.11145319  0.10012731 
+##      cherri       drink       palat        acid      finish       aroma 
+##  0.00000000  0.00000000  0.00000000  0.08710201  0.00000000  0.00000000 
+## colour_whit      flavor    colour_r 
+##  0.00000000  0.00000000  0.03501981
 ```
 
 ---
@@ -659,13 +663,13 @@ wine_explainer &lt;- lime::lime(
 
 .pull-left[
 
-&gt; Fresh, creamy and tightly packed with stone fruit and melon, this lively Pinot Grigio would pair with appetizers or seafood. It boasts a soft, smooth finish with a touch of citrus acidity at the end.
+&gt; Fresh, creamy and tightly packed with stone fruit and melon, this lively Pinot Grigio would pair with appetizers or seafood. It boasts a soft, smooth finish with a touch of citrus acidity at the end. colour_white
 
 
 ```r
-wine_17640 &lt;- filter(wine, index == 17640)
-wine_17640_explanation &lt;- lime::explain(
-  wine_17640$description,
+wine_a &lt;- filter(wine, index == 17640)
+wine_a_explanation &lt;- lime::explain(
+  wine_a$description,
   wine_explainer,
   n_features = 10
 )
@@ -674,13 +678,13 @@ wine_17640_explanation &lt;- lime::explain(
 
 ```r
 custom_lime_explanation_plot(
-  wine_17640_explanation, wine_17640
+  wine_a_explanation, wine_a
 )
 ```
 ]
 
 .pull-right[
-&lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_17640_explanation_plot_out-1.png" width="500" height="500" /&gt;
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_a_explanation_plot_out-1.png" width="500" height="500" /&gt;
 ]
 
 ---
@@ -688,13 +692,13 @@ custom_lime_explanation_plot(
 
 .pull-left[
 
-&gt; Pronounced dust, pollen and earth tones lend savoriness to this otherwise citrusy wine. Racy acidity and fresh tangerine and lemon flavors turn herbal on the finish. Drink now.
+&gt; Pronounced dust, pollen and earth tones lend savoriness to this otherwise citrusy wine. Racy acidity and fresh tangerine and lemon flavors turn herbal on the finish. Drink now. colour_white
 
 
 ```r
-wine_85 &lt;- filter(wine, index == 85)
-wine_85_explanation &lt;- lime::explain(
-  wine_85$description,
+wine_b &lt;- filter(wine, index == 85)
+wine_b_explanation &lt;- lime::explain(
+  wine_b$description,
   wine_explainer,
   n_features = 10
 )
@@ -703,13 +707,13 @@ wine_85_explanation &lt;- lime::explain(
 
 ```r
 custom_lime_explanation_plot(
-  wine_85_explanation, wine_85
+  wine_b_explanation, wine_b
 )
 ```
 ]
 
 .pull-right[
-&lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_85_explanation_plot_out-1.png" width="500" height="500" /&gt;
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_b_explanation_plot_out-1.png" width="500" height="500" /&gt;
 ]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

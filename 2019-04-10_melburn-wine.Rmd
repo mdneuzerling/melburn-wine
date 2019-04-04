@@ -318,6 +318,8 @@ class: inverse
 We're about to do some modelling, so let's prepare our train and test sets.
 
 ```{r wine_split}
+wine <- wine %>% 
+  mutate(description = paste0(description, " colour_", colour))
 wine_split <- rsample::initial_split(wine, strata = "colour", p = 0.80)
 wine_train <- rsample::training(wine_split)
 wine_test <- rsample::testing(wine_split)
@@ -384,7 +386,7 @@ vocabulary <- text2vec::create_vocabulary(
   wine_train_tokens, 
   stopwords = c(
     tidytext::stop_words$word, 
-    "wine", "fruit", "flavour"
+    "wine", "fruit", "flavour", "flavor"
   )
 ) %>% 
   text2vec::prune_vocabulary(
@@ -550,7 +552,7 @@ custom_lime_explanation_plot <- function(
 
 .pull-left[
 
-```{r sample_wine_description, results='asis', echo = FALSE}
+```{r wine_a_description, results='asis', echo = FALSE}
 wine %>% 
   filter(index == 17640) %>% 
   pull(description) %>% 
@@ -558,24 +560,24 @@ wine %>%
   cat
 ```
 
-```{r wine_17640_explanation}
-wine_17640 <- filter(wine, index == 17640)
-wine_17640_explanation <- lime::explain(
-  wine_17640$description,
+```{r wine_a_explanation}
+wine_a <- filter(wine, index == 17640)
+wine_a_explanation <- lime::explain(
+  wine_a$description,
   wine_explainer,
   n_features = 10
 )
 ```
 
-```{r wine_17640_explanation_plot, eval=FALSE}
+```{r wine_a_explanation_plot, eval=FALSE}
 custom_lime_explanation_plot(
-  wine_17640_explanation, wine_17640
+  wine_a_explanation, wine_a
 )
 ```
 ]
 
 .pull-right[
-```{r wine_17640_explanation_plot_out, ref.label="wine_17640_explanation_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
+```{r wine_a_explanation_plot_out, ref.label="wine_a_explanation_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
 
 ```
 ]
@@ -585,7 +587,7 @@ custom_lime_explanation_plot(
 
 .pull-left[
 
-```{r sample_wine_2_description, results='asis', echo = FALSE}
+```{r wine_b_description, results='asis', echo = FALSE}
 wine %>% 
   filter(index == 85) %>% 
   pull(description) %>% 
@@ -593,23 +595,23 @@ wine %>%
   cat
 ```
 
-```{r wine_85_explanation}
-wine_85 <- filter(wine, index == 85)
-wine_85_explanation <- lime::explain(
-  wine_85$description,
+```{r wine_b_explanation}
+wine_b <- filter(wine, index == 85)
+wine_b_explanation <- lime::explain(
+  wine_b$description,
   wine_explainer,
   n_features = 10
 )
 ```
 
-```{r wine_85_explanation_plot, eval=FALSE}
+```{r wine_b_explanation_plot, eval=FALSE}
 custom_lime_explanation_plot(
-  wine_85_explanation, wine_85
+  wine_b_explanation, wine_b
 )
 ```
 ]
 
 .pull-right[
-```{r wine_85_explanation_plot_out, ref.label="wine_85_explanation_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
+```{r wine_b_explanation_plot_out, ref.label="wine_b_explanation_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
 ```
 ]
