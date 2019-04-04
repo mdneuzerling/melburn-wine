@@ -484,11 +484,14 @@ wine_train_tokens &lt;- text2vec::itoken(
 
 vocabulary &lt;- text2vec::create_vocabulary(
   wine_train_tokens, 
-  stopwords = tidytext::stop_words$word
+  stopwords = c(
+    tidytext::stop_words$word, 
+    "wine", "fruit", "flavour"
+  )
 ) %&gt;% 
   text2vec::prune_vocabulary(
     doc_proportion_min = 0.01,
-    doc_proportion_max = 0.25
+    doc_proportion_max = 0.80
   )
 ```
 ]
@@ -523,7 +526,7 @@ vocabulary
 class: inverse
 ## Vectoriser
 
-Our `vectoriser` will take an arbitrary string and map it to these 365 stemmed terms. 
+Our `vectoriser` will take an arbitrary string and map it to these 371 stemmed terms. 
 
 Any new terms will be **ignored**.
 
@@ -535,7 +538,7 @@ vectoriser &lt;- vocabulary %&gt;% text2vec::vocab_vectorizer()
 ---
 ## Document term matrices
 
-* Every column is one of our 365 terms
+* Every column is one of our 371 terms
 * Every row is a wine review
 * Values are weighted by *term frequency–inverse document frequency (tf-idf)*
 

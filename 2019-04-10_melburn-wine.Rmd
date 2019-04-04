@@ -382,11 +382,14 @@ wine_train_tokens <- text2vec::itoken(
 
 vocabulary <- text2vec::create_vocabulary(
   wine_train_tokens, 
-  stopwords = tidytext::stop_words$word
+  stopwords = c(
+    tidytext::stop_words$word, 
+    "wine", "fruit", "flavour"
+  )
 ) %>% 
   text2vec::prune_vocabulary(
     doc_proportion_min = 0.01,
-    doc_proportion_max = 0.25
+    doc_proportion_max = 0.80
   )
 ```
 ]
