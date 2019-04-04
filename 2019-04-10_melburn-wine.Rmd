@@ -458,8 +458,8 @@ map_to_dtm <- function(text) {
 ```{r xgboost, cache = TRUE}
 xgb <- xgboost::xgb.train(
   list(
-    max_depth = 7, 
-    eta = 0.1, 
+    max_depth = 8, 
+    eta = 0.05, 
     objective = "reg:linear",
     eval_metric = "rmse"
   ),
@@ -467,7 +467,7 @@ xgb <- xgboost::xgb.train(
     wine_train_dtm, 
     label = wine_train$points
   ),
-  nrounds = 1000
+  nrounds = 300
 )
 ```
 
@@ -499,7 +499,7 @@ class: inverse
 
 ```{r wine_explainer, cache=TRUE}
 wine_explainer <- lime::lime(
-  wine$description,
+  wine_train$description,
   xgb,
   preprocess = map_to_dtm
 )
@@ -549,30 +549,64 @@ custom_lime_explanation_plot <- function(
 
 ```{r sample_wine_description, results='asis', echo = FALSE}
 wine %>% 
-  filter(index == 71573) %>% 
+  filter(index == 17640) %>% 
   pull(description) %>% 
   paste0("> ", .) %>% 
   cat
 ```
 
-```{r xgb_explanation}
-sample_wine <- filter(wine, index == 71573)
-sample_wine_explanation <- lime::explain(
-  sample_wine$description,
+```{r wine_17640_explanation}
+wine_17640 <- filter(wine, index == 17640)
+wine_17640_explanation <- lime::explain(
+  wine_17640$description,
   wine_explainer,
   n_features = 10
 )
 ```
 
-```{r sample_wine_explanation_plot, eval=FALSE}
+```{r wine_17640_explanation_plot, eval=FALSE}
 custom_lime_explanation_plot(
-  sample_wine_explanation, sample_wine
+  wine_17640_explanation, wine_17640
 )
 ```
 ]
 
 .pull-right[
-```{r sample_wine_explanation_plot_out, ref.label="sample_wine_explanation_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
+```{r wine_17640_explanation_plot_out, ref.label="wine_17640_explanation_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
 
+```
+]
+
+---
+## LIME
+
+.pull-left[
+
+```{r sample_wine_2_description, results='asis', echo = FALSE}
+wine %>% 
+  filter(index == 85) %>% 
+  pull(description) %>% 
+  paste0("> ", .) %>% 
+  cat
+```
+
+```{r wine_85_explanation}
+wine_85 <- filter(wine, index == 85)
+wine_85_explanation <- lime::explain(
+  wine_85$description,
+  wine_explainer,
+  n_features = 10
+)
+```
+
+```{r wine_85_explanation_plot, eval=FALSE}
+custom_lime_explanation_plot(
+  wine_85_explanation, wine_85
+)
+```
+]
+
+.pull-right[
+```{r wine_85_explanation_plot_out, ref.label="wine_85_explanation_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
 ```
 ]

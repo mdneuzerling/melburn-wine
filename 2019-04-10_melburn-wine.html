@@ -601,8 +601,8 @@ map_to_dtm &lt;- function(text) {
 ```r
 xgb &lt;- xgboost::xgb.train(
   list(
-    max_depth = 7, 
-    eta = 0.1, 
+    max_depth = 8, 
+    eta = 0.05, 
     objective = "reg:linear",
     eval_metric = "rmse"
   ),
@@ -610,7 +610,7 @@ xgb &lt;- xgboost::xgb.train(
     wine_train_dtm, 
     label = wine_train$points
   ),
-  nrounds = 1000
+  nrounds = 300
 )
 ```
 
@@ -643,7 +643,7 @@ class: inverse
 
 ```r
 wine_explainer &lt;- lime::lime(
-  wine$description,
+  wine_train$description,
   xgb,
   preprocess = map_to_dtm
 )
@@ -656,13 +656,13 @@ wine_explainer &lt;- lime::lime(
 
 .pull-left[
 
-&gt; Rich and creamy, showing tangerine, apricot, buttered toast, cinnamon spice and herb flavors. A solid wine for drinking with roast salmon, seared tuna or a salad of bitter greens with goat cheese and orange slices.
+&gt; Fresh, creamy and tightly packed with stone fruit and melon, this lively Pinot Grigio would pair with appetizers or seafood. It boasts a soft, smooth finish with a touch of citrus acidity at the end.
 
 
 ```r
-sample_wine &lt;- filter(wine, index == 71573)
-sample_wine_explanation &lt;- lime::explain(
-  sample_wine$description,
+wine_17640 &lt;- filter(wine, index == 17640)
+wine_17640_explanation &lt;- lime::explain(
+  wine_17640$description,
   wine_explainer,
   n_features = 10
 )
@@ -671,13 +671,42 @@ sample_wine_explanation &lt;- lime::explain(
 
 ```r
 custom_lime_explanation_plot(
-  sample_wine_explanation, sample_wine
+  wine_17640_explanation, wine_17640
 )
 ```
 ]
 
 .pull-right[
-&lt;img src="2019-04-10_melburn-wine_files/figure-html/sample_wine_explanation_plot_out-1.png" width="500" height="500" /&gt;
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_17640_explanation_plot_out-1.png" width="500" height="500" /&gt;
+]
+
+---
+## LIME
+
+.pull-left[
+
+&gt; Pronounced dust, pollen and earth tones lend savoriness to this otherwise citrusy wine. Racy acidity and fresh tangerine and lemon flavors turn herbal on the finish. Drink now.
+
+
+```r
+wine_85 &lt;- filter(wine, index == 85)
+wine_85_explanation &lt;- lime::explain(
+  wine_85$description,
+  wine_explainer,
+  n_features = 10
+)
+```
+
+
+```r
+custom_lime_explanation_plot(
+  wine_85_explanation, wine_85
+)
+```
+]
+
+.pull-right[
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_85_explanation_plot_out-1.png" width="500" height="500" /&gt;
 ]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
