@@ -489,7 +489,7 @@ vocabulary &lt;- text2vec::create_vocabulary(
   stopwords = c(
     tidytext::stop_words$word, 
     "wine", "fruit", "flavour", "flavor",
-    "colour_red" # defined by the absence of white or rosé
+    "colour_red" # defined by absence
   )
 ) %&gt;% 
   text2vec::prune_vocabulary(
