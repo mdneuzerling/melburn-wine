@@ -512,7 +512,11 @@ vocabulary
 
 ```
 ## Number of docs: 103978 
+<<<<<<< HEAD
 ## 1153 stopwords: a, a's, able, about, above, according ... 
+=======
+## 1154 stopwords: a, a's, able, about, above, according ... 
+>>>>>>> 03de1ed3af09f912c7be95050c251d0e2dfeb481
 ## ngram_min = 1; ngram_max = 1 
 ## Vocabulary: 
 ##             term term_count doc_count
@@ -656,7 +660,7 @@ class: inverse
 
 ```r
 wine_explainer &lt;- lime::lime(
-  wine_train$description,
+  wine$description,
   xgb,
   preprocess = map_to_dtm
 )
