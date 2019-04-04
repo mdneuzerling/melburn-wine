@@ -664,11 +664,11 @@ wine_explainer &lt;- lime::lime(
 
 .pull-left[
 
-&gt; This is a solid and well-made Chardonnay, with notes of yellow apple, melon and fresh hay on the nose and mouth. There's a subtle astringency to the fruit flavors on the medium-weight palate, with bright acidity that carries through to the clean and refreshing finish. Drink now–2019. colour_white
+&gt; Oak completely overwhelms this wine. All you can smell and taste is char, caramel and wood spice, and the tannins, which are partly from oak barrels, are dense and hard. It's difficult even to discern any underlying fruit flavors, although if you try hard, you stumble across blackberries. colour_red
 
 
 ```r
-wine_a &lt;- filter(wine, index == 104742)
+wine_a &lt;- filter(wine, index == 14072)
 wine_a_explanation &lt;- lime::explain(
   wine_a$description,
   wine_explainer,
@@ -693,11 +693,11 @@ custom_lime_explanation_plot(
 
 .pull-left[
 
-&gt; Coconut, smoke and sweet aromas of cola, berry jam and fine tobacco make the bouquet inviting. In the mouth, it maintains freshness due to good acidity, while the flavors of earthy blackberry and plum come across dense and right. Firm and tannic on the finish; drink from 2012–2016. colour_red
+&gt; Picked at 33 brix and fermented in new French oak, this heavy, almost oily dessert wine has a floral aroma as intense as bottled perfume. Flavors suggest orange liqueur, honey and candied apricots. It pulls together just enough acidity to avoid falling into a fat, cloying finish. colour_white
 
 
 ```r
-wine_b &lt;- filter(wine, index == 51558)
+wine_b &lt;- filter(wine, index == 57215)
 wine_b_explanation &lt;- lime::explain(
   wine_b$description,
   wine_explainer,
@@ -708,7 +708,7 @@ wine_b_explanation &lt;- lime::explain(
 
 ```r
 custom_lime_explanation_plot(
-  wine_b_explanation, wine_b
+  wine_b_explanation, wine_b 
 )
 ```
 ]
