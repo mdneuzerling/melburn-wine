@@ -312,14 +312,17 @@ wine_2grams %>%
 ]
 
 ---
-class: inverse
 ## Train and test
 
-We're about to do some modelling, so let's prepare our train and test sets.
-
-```{r wine_split}
+I want to include `colour` as a predictor, so I'm going to stick it onto the end of the `description`.
+```{r adding_some_colour, results='asis'}
 wine <- wine %>% 
   mutate(description = paste0(description, " colour_", colour))
+paste0("> ", wine$description[12412]) %>% cat
+```
+
+Let's prepare our train and test sets:
+```{r wine_split}
 wine_split <- rsample::initial_split(wine, strata = "colour", p = 0.80)
 wine_train <- rsample::training(wine_split)
 wine_test <- rsample::testing(wine_split)
@@ -386,8 +389,7 @@ vocabulary <- text2vec::create_vocabulary(
   wine_train_tokens, 
   stopwords = c(
     tidytext::stop_words$word, 
-    "wine", "fruit", "flavour", "flavor",
-    "colour_red" # defined by absence
+    "wine", "fruit", "flavour", "flavor"
   )
 ) %>% 
   text2vec::prune_vocabulary(
