@@ -641,6 +641,17 @@ caret::postResample(wine_test_preds, wine_test$points)
 ---
 ## xgboost
 
+.pull-left[
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/actuals_distribution-1.png" width="500" height="500" /&gt;
+]
+
+.pull-right[
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/predicted_distribution-1.png" width="500" height="500" /&gt;
+]
+
+---
+## xgboost
+
 
 ```r
 wine_test_residuals &lt;- wine_test_preds - wine_test$points
@@ -651,6 +662,14 @@ wine_test %&gt;%
 ```
 
 &lt;img src="2019-04-10_melburn-wine_files/figure-html/xgboost_residuals_actuals-1.png" width="800" height="350" /&gt;
+
+---
+class:center
+## Model performance summary
+
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/smily_eyes-1.png" width="500" height="250" /&gt;
+
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/smiley_mouth-1.png" width="500" height="250" /&gt;
 
 ---
 class: inverse

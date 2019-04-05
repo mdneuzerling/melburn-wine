@@ -487,12 +487,56 @@ caret::postResample(wine_test_preds, wine_test$points)
 ---
 ## xgboost
 
+.pull-left[
+```{r actuals_distribution, echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
+wine_test_actuals_plot <- wine_test %>% ggplot(aes(x = points)) + 
+  geom_histogram(
+    breaks = seq(80, 100, 1),
+    colour = white_wine_colour,
+    fill = red_wine_colour
+  ) + 
+  labs(title = "actuals", x = "points")
+wine_test_actuals_plot
+```
+]
+
+.pull-right[
+```{r predicted_distribution, echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
+wine_test_preds_plot <- wine_test %>% ggplot(aes(x = wine_test_preds)) + 
+  geom_histogram(
+    breaks = seq(80, 100, 1),
+    colour = white_wine_colour,
+    fill = red_wine_colour
+  ) + 
+  labs(title = "predicted", x = "points")
+wine_test_preds_plot
+```
+]
+
+---
+## xgboost
+
 ```{r xgboost_residuals_actuals, dpi = 300, fig.width = 8, fig.height = 3.5, out.height = 350, out.width = 800}
 wine_test_residuals <- wine_test_preds - wine_test$points
 wine_test %>% 
   ggplot(aes(x = points, y = wine_test_residuals, group = points)) + 
   geom_violin(fill = red_wine_colour) +
   labs(title = "actuals vs. residuals", x = "actuals", y = "residuals") 
+```
+
+---
+class:center
+## Model performance summary
+
+```{r smily_eyes, echo=FALSE, dpi = 300, fig.width = 5, fig.height = 2.5, out.width = 500, out.height = 250}
+gridExtra::grid.arrange(
+  wine_test_actuals_plot,
+  wine_test_preds_plot,
+  ncol = 2
+)
+```
+
+```{r smiley_mouth, ref.label="xgboost_residuals_actuals", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 2.5, out.width = 500, out.height = 250}
 ```
 
 ---
