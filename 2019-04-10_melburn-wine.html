@@ -639,6 +639,20 @@ caret::postResample(wine_test_preds, wine_test$points)
 ```
 
 ---
+## xgboost
+
+
+```r
+wine_test_residuals &lt;- wine_test_preds - wine_test$points
+wine_test %&gt;% 
+  ggplot(aes(x = points, y = wine_test_residuals, group = points)) + 
+  geom_violin(fill = red_wine_colour) +
+  labs(title = "actuals vs. residuals", x = "actuals", y = "residuals") 
+```
+
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/xgboost_residuals_actuals-1.png" width="800" height="350" /&gt;
+
+---
 class: inverse
 ## LIME
 
@@ -660,6 +674,16 @@ class: inverse
 
 *lime-rick* by Mara Averick
 ]
+
+---
+## LIME
+
+LIME doesn't care about non-linear models, it just needs things to be *locally linear*:
+
+&lt;center&gt;
+&lt;img src="https://raw.githubusercontent.com/marcotcr/lime/master/doc/images/lime.png" alt="LIME" style="width: 65%; height: 65%;"&gt;&lt;/img&gt;
+&lt;/center&gt;
+
 
 ---
 ## LIME
