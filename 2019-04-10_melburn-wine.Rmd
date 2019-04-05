@@ -764,3 +764,82 @@ custom_lime_explanation_plot(
 ```{r wine_d_explanation_plot_out, ref.label="wine_d_explanation_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
 ```
 ]
+
+---
+## Categorical predictions
+
+The LIME package comes with an interactive shiny application for text explainers. It only works with classification models, so let's make one. We'll set the boundary between a good and a bad wine as the mean of the training set, `r round(mean(wine_train$points), 1)` points.
+
+```{r wine_good_or_bad}
+wine_train <- wine_train %>% mutate(
+  good_or_bad = ifelse(points > mean(wine_train$points), "good", "bad")
+)
+
+wine_test <- wine_test %>% mutate(
+  good_or_bad = ifelse(points > mean(wine_train$points), "good", "bad")
+)
+```
+
+---
+## Categorical predictions
+```{r xgb_classification}
+xgb_classification <- xgboost::xgb.train(
+  list(
+    max_depth = 8, 
+    eta = 0.05, 
+    objective = "binary:logistic",
+    eval_metric = "error"
+  ),
+  data = xgboost::xgb.DMatrix(
+    wine_train_dtm, 
+    label = wine_train$good_or_bad == "good"
+  ),
+  nrounds = 200
+)
+```
+
+
+---
+## Categorical predictions
+
+.pull-left[
+```{r xgb_classification_confusion_matrix}
+wine_categorical_preds <- predict(
+  xgb_classification, 
+  map_to_dtm(wine_test$description)
+)
+
+cm <- caret::confusionMatrix(
+  as.factor(
+    ifelse(wine_test$good_or_bad == "good", 1, 0)
+  ),
+  as.factor(round(
+    wine_categorical_preds, 
+    digits = 0
+  ))
+)
+```
+]
+
+.pull-right[
+```{r xgb_classification_confusion_matrix_table}
+cm$table
+```
+
+```{r xgb_classification_confusion_matrix_accuracy}
+scales::percent(cm$overall[["Accuracy"]])
+```
+]
+
+---
+class: inverse
+## Interactive text explanations
+
+```{r eval=FALSE}
+wine_classification_explainer <- lime::lime(
+  wine$description,
+  xgb_classification,
+  preprocess = map_to_dtm
+)
+lime::interactive_text_explanations(wine_explainer)
+```

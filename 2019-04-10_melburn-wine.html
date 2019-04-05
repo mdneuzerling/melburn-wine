@@ -806,6 +806,97 @@ custom_lime_explanation_plot(
 .pull-right[
 &lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_d_explanation_plot_out-1.png" width="500" height="500" /&gt;
 ]
+
+---
+## Categorical predictions
+
+The LIME package comes with an interactive shiny application for text explainers. It only works with classification models, so let's make one. We'll set the boundary between a good and a bad wine as the mean of the training set, 88.4 points.
+
+
+```r
+wine_train &lt;- wine_train %&gt;% mutate(
+  wine_is_good =  as.integer(points &gt; mean(wine_train$points))
+)
+
+wine_test &lt;- wine_test %&gt;% mutate(
+  wine_is_good = as.integer(points &gt; mean(wine_train$points))
+)
+```
+
+---
+## Categorical predictions
+
+```r
+xgb_classification &lt;- xgboost::xgb.train(
+  list(
+    max_depth = 8, 
+    eta = 0.05, 
+    objective = "binary:logistic",
+    eval_metric = "error"
+  ),
+  data = xgboost::xgb.DMatrix(
+    wine_train_dtm, 
+    label = wine_train$wine_is_good
+  ),
+  nrounds = 200
+)
+```
+
+
+---
+## Categorical predictions
+
+.pull-left[
+
+```r
+wine_categorical_preds &lt;- predict(
+  xgb_classification, 
+  map_to_dtm(wine_test$description)
+)
+
+cm &lt;- caret::confusionMatrix(
+  as.factor(
+    wine_test$wine_is_good
+  ),
+  as.factor(round(
+    wine_categorical_preds, 
+    digits = 0
+  ))
+)
+```
+]
+
+.pull-right[
+
+```r
+cm$table
+```
+
+```
+##           Reference
+## Prediction     0     1
+##          0 11742  1969
+##          1  4044  8238
+```
+
+
+```r
+scales::percent(cm$overall[["Accuracy"]])
+```
+
+```
+## [1] "76.9%"
+```
+]
+
+---
+class: inverse
+## Interactive text explanations
+
+
+```r
+lime::interactive_text_explanations(wine_explainer)
+```
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
