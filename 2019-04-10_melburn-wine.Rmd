@@ -479,6 +479,11 @@ xgb <- xgboost::xgb.train(
 )
 ```
 
+```{r xgboost_performance}
+wine_test_preds <- predict(xgb, map_to_dtm(wine_test$description))
+caret::postResample(wine_test_preds, wine_test$points)
+```
+
 ---
 class: inverse
 ## LIME

@@ -627,6 +627,17 @@ xgb &lt;- xgboost::xgb.train(
 )
 ```
 
+
+```r
+wine_test_preds &lt;- predict(xgb, map_to_dtm(wine_test$description))
+caret::postResample(wine_test_preds, wine_test$points)
+```
+
+```
+##      RMSE  Rsquared       MAE 
+## 2.0794359 0.5482896 1.6341324
+```
+
 ---
 class: inverse
 ## LIME
