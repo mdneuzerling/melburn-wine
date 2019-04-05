@@ -1,6 +1,6 @@
 ---
 title: "LIME Wine"
-subtitle: "Melbourne Users of R Network (MelbURN)"
+subtitle: "Melbourne Users of R Network (MelbURN)<br/>https://github.com/mdneuzerling/melburn-wine/"
 author: "@mdneuzerling"
 date: "2019-04-10"
 output:
