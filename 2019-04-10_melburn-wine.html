@@ -512,11 +512,7 @@ vocabulary
 
 ```
 ## Number of docs: 103978 
-<<<<<<< HEAD
 ## 1153 stopwords: a, a's, able, about, above, according ... 
-=======
-## 1154 stopwords: a, a's, able, about, above, according ... 
->>>>>>> 03de1ed3af09f912c7be95050c251d0e2dfeb481
 ## ngram_min = 1; ngram_max = 1 
 ## Vocabulary: 
 ##             term term_count doc_count
@@ -653,6 +649,18 @@ class: inverse
 
 *lime-rick* by Mara Averick
 ]
+
+---
+## LIME
+
+
+```r
+# This example requires the magick package
+example_image_explanation &lt;- lime::.load_image_example() 
+lime::plot_image_explanation(example_image_explanation)
+```
+
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/example_image_explanation-1.png" width="1000" height="400" /&gt;
 
 ---
 ## LIME

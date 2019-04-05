@@ -505,6 +505,15 @@ class: inverse
 ---
 ## LIME
 
+```{r example_image_explanation, dpi = 300, fig.width = 10, fig.height = 4, out.height = 400, out.width = 1000}
+# This example requires the magick package
+example_image_explanation <- lime::.load_image_example() 
+lime::plot_image_explanation(example_image_explanation)
+```
+
+---
+## LIME
+
 ```{r wine_explainer, cache=TRUE}
 wine_explainer <- lime::lime(
   wine$description,
