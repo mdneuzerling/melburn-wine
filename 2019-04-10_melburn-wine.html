@@ -700,7 +700,7 @@ class: inverse
 LIME doesn't care about non-linear models, it just needs things to be *locally linear*:
 
 &lt;center&gt;
-&lt;img src="https://raw.githubusercontent.com/marcotcr/lime/master/doc/images/lime.png" alt="LIME" style="width: 65%; height: 65%;"&gt;&lt;/img&gt;
+&lt;img src="https://raw.githubusercontent.com/marcotcr/lime/master/doc/images/lime.png" alt="A rectangular graph. An irregularly shaped pink blob is on top of a blue background. A dashed line sits across a linear boundary between the blob and the background, demonstrating a separation of points immediately on either side. There are no axes or other quantitative information." style="width: 65%; height: 65%;"&gt;&lt;/img&gt;
 &lt;/center&gt;
 
 
@@ -739,9 +739,9 @@ wine_explainer &lt;- lime::lime(
 
 
 ```r
-wine_a &lt;- filter(wine, index == 14072)
-wine_a_explanation &lt;- lime::explain(
-  wine_a$description,
+sample_wine &lt;- filter(wine, index == 14072)
+sample_wine_explanation &lt;- lime::explain(
+  sample_wine$description,
   wine_explainer,
   n_features = 10
 )
@@ -750,7 +750,7 @@ wine_a_explanation &lt;- lime::explain(
 
 ```r
 custom_lime_explanation_plot(
-  wine_a_explanation, wine_a 
+  sample_wine_explanation, sample_wine 
 )
 ```
 ]
@@ -767,25 +767,44 @@ custom_lime_explanation_plot(
 &gt; Picked at 33 brix and fermented in new French oak, this heavy, almost oily dessert wine has a floral aroma as intense as bottled perfume. Flavors suggest orange liqueur, honey and candied apricots. It pulls together just enough acidity to avoid falling into a fat, cloying finish. colour_white
 
 
-```r
-wine_b &lt;- filter(wine, index == 57215)
-wine_b_explanation &lt;- lime::explain(
-  wine_b$description,
-  wine_explainer,
-  n_features = 10
-)
-```
 
 
-```r
-custom_lime_explanation_plot(
-  wine_b_explanation, wine_b 
-)
-```
 ]
 
 .pull-right[
 &lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_b_explanation_plot_out-1.png" width="500" height="500" /&gt;
+]
+
+---
+## LIME
+
+.pull-left[
+
+&gt; It takes only a few moments before you appreciate the enormity, intensity and overall beauty of this landmark wine. Cerretalto is always a high scoring expression of Brunello, but the ideal conditions of the 2007 vintage elevate it to earthly perfection. Dark and fleshy, the wine delivers ever-evolving aromas of dark fruit, chocolate, spice and tobacco. The acidity is carefully balanced against the wine's thickness and rich texture. The finish is long, luscious and elegant. Keep this bottle in your cellar 10 years or more. colour_red
+
+
+
+
+]
+
+.pull-right[
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_c_explanation_plot_out-1.png" width="500" height="500" /&gt;
+]
+
+---
+## LIME
+
+.pull-left[
+
+&gt; Rubbery, animal-like aromas are low on fruit. The palate is shrill and dominated by sharp acidity. Sour, herbal and pinched tasting, this is tart and green overall. colour_red
+
+
+
+
+]
+
+.pull-right[
+&lt;img src="2019-04-10_melburn-wine_files/figure-html/wine_d_explanation_plot_out-1.png" width="500" height="500" /&gt;
 ]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

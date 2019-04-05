@@ -568,7 +568,7 @@ class: inverse
 LIME doesn't care about non-linear models, it just needs things to be *locally linear*:
 
 <center>
-<img src="https://raw.githubusercontent.com/marcotcr/lime/master/doc/images/lime.png" alt="LIME" style="width: 65%; height: 65%;"></img>
+<img src="https://raw.githubusercontent.com/marcotcr/lime/master/doc/images/lime.png" alt="A rectangular graph. An irregularly shaped pink blob is on top of a blue background. A dashed line sits across a linear boundary between the blob and the background, demonstrating a separation of points immediately on either side. There are no axes or other quantitative information." style="width: 65%; height: 65%;"></img>
 </center>
 
 
@@ -643,9 +643,9 @@ wine %>%
 ```
 
 ```{r wine_a_explanation}
-wine_a <- filter(wine, index == 14072)
-wine_a_explanation <- lime::explain(
-  wine_a$description,
+sample_wine <- filter(wine, index == 14072)
+sample_wine_explanation <- lime::explain(
+  sample_wine$description,
   wine_explainer,
   n_features = 10
 )
@@ -653,7 +653,7 @@ wine_a_explanation <- lime::explain(
 
 ```{r wine_a_explanation_plot, eval=FALSE}
 custom_lime_explanation_plot(
-  wine_a_explanation, wine_a 
+  sample_wine_explanation, sample_wine 
 )
 ```
 ]
@@ -676,7 +676,7 @@ wine %>%
   cat
 ```
 
-```{r wine_b_explanation}
+```{r wine_b_explanation, echo=FALSE}
 wine_b <- filter(wine, index == 57215)
 wine_b_explanation <- lime::explain(
   wine_b$description,
@@ -685,7 +685,7 @@ wine_b_explanation <- lime::explain(
 )
 ```
 
-```{r wine_b_explanation_plot, eval=FALSE}
+```{r wine_b_explanation_plot, echo=FALSE, eval=FALSE}
 custom_lime_explanation_plot(
   wine_b_explanation, wine_b 
 )
@@ -694,5 +694,73 @@ custom_lime_explanation_plot(
 
 .pull-right[
 ```{r wine_b_explanation_plot_out, ref.label="wine_b_explanation_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
+```
+]
+
+---
+## LIME
+
+.pull-left[
+
+```{r wine_c_description, results='asis', echo = FALSE}
+wine %>% 
+  filter(index == 111754) %>% 
+  pull(description) %>% 
+  paste0("> ", .) %>% 
+  cat
+```
+
+```{r wine_c_explanation, echo=FALSE}
+wine_c <- filter(wine, index == 111754)
+wine_c_explanation <- lime::explain(
+  wine_c$description,
+  wine_explainer,
+  n_features = 10
+)
+```
+
+```{r wine_c_explanation_plot, echo=FALSE, eval=FALSE}
+custom_lime_explanation_plot(
+  wine_c_explanation, wine_c
+)
+```
+]
+
+.pull-right[
+```{r wine_c_explanation_plot_out, ref.label="wine_c_explanation_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
+```
+]
+
+---
+## LIME
+
+.pull-left[
+
+```{r wine_d_description, results='asis', echo = FALSE}
+wine %>% 
+  filter(index == 13781) %>% 
+  pull(description) %>% 
+  paste0("> ", .) %>% 
+  cat
+```
+
+```{r wine_d_explanation, echo=FALSE}
+wine_d <- filter(wine, index == 13781)
+wine_d_explanation <- lime::explain(
+  wine_d$description,
+  wine_explainer,
+  n_features = 10
+)
+```
+
+```{r wine_d_explanation_plot, echo=FALSE, eval=FALSE}
+custom_lime_explanation_plot(
+  wine_d_explanation, wine_d
+)
+```
+]
+
+.pull-right[
+```{r wine_d_explanation_plot_out, ref.label="wine_d_explanation_plot", echo=FALSE, dpi = 300, fig.width = 5, fig.height = 5, out.height = 500, out.width = 500}
 ```
 ]
