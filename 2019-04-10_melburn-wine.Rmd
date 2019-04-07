@@ -785,7 +785,7 @@ wine_test <- wine_test %>% mutate(
 ```{r xgb_classification}
 xgb_classification <- xgboost::xgb.train(
   list(
-    max_depth = 8, 
+    max_depth = 8,
     eta = 0.05, 
     objective = "binary:logistic",
     eval_metric = "error"
@@ -811,7 +811,9 @@ wine_categorical_preds <- predict(
 
 cm <- caret::confusionMatrix(
   as.factor(
-    ifelse(wine_test$good_or_bad == "good", 1, 0)
+    as.numeric(
+      wine_test$good_or_bad == "good"
+    )
   ),
   as.factor(round(
     wine_categorical_preds, 
@@ -841,5 +843,5 @@ wine_classification_explainer <- lime::lime(
   xgb_classification,
   preprocess = map_to_dtm
 )
-lime::interactive_text_explanations(wine_explainer)
+lime::interactive_text_explanations(wine_classification_explainer)
 ```

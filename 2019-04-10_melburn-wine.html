@@ -815,11 +815,11 @@ The LIME package comes with an interactive shiny application for text explainers
 
 ```r
 wine_train &lt;- wine_train %&gt;% mutate(
-  wine_is_good =  as.integer(points &gt; mean(wine_train$points))
+  good_or_bad = ifelse(points &gt; mean(wine_train$points), "good", "bad")
 )
 
 wine_test &lt;- wine_test %&gt;% mutate(
-  wine_is_good = as.integer(points &gt; mean(wine_train$points))
+  good_or_bad = ifelse(points &gt; mean(wine_train$points), "good", "bad")
 )
 ```
 
@@ -829,14 +829,14 @@ wine_test &lt;- wine_test %&gt;% mutate(
 ```r
 xgb_classification &lt;- xgboost::xgb.train(
   list(
-    max_depth = 8, 
+    max_depth = 8,
     eta = 0.05, 
     objective = "binary:logistic",
     eval_metric = "error"
   ),
   data = xgboost::xgb.DMatrix(
     wine_train_dtm, 
-    label = wine_train$wine_is_good
+    label = wine_train$good_or_bad == "good"
   ),
   nrounds = 200
 )
@@ -856,7 +856,9 @@ wine_categorical_preds &lt;- predict(
 
 cm &lt;- caret::confusionMatrix(
   as.factor(
-    wine_test$wine_is_good
+    as.numeric(
+      wine_test$good_or_bad == "good"
+    )
   ),
   as.factor(round(
     wine_categorical_preds, 
@@ -895,7 +897,12 @@ class: inverse
 
 
 ```r
-lime::interactive_text_explanations(wine_explainer)
+wine_classification_explainer &lt;- lime::lime(
+  wine$description,
+  xgb_classification,
+  preprocess = map_to_dtm
+)
+lime::interactive_text_explanations(wine_classification_explainer)
 ```
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
