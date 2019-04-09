@@ -317,7 +317,12 @@ wine_2grams %>%
 I want to include `colour` as a predictor, so I'm going to stick it onto the end of the `description`.
 ```{r adding_some_colour, results='asis'}
 wine <- wine %>% 
-  mutate(description = paste0(description, " colour_", colour))
+  mutate(
+    description = case_when(
+      colour == "red" ~ description, # defined by absence
+      TRUE ~ paste0(description, " colour_", colour)
+    )
+  )
 paste0("> ", wine$description[12412]) %>% cat
 ```
 
@@ -580,6 +585,26 @@ LIME doesn't care about non-linear models, it just needs things to be *locally l
 example_image_explanation <- lime::.load_image_example() 
 lime::plot_image_explanation(example_image_explanation)
 ```
+
+## LIME
+---
+## Permutations
+
+### Wine 78883, 80 points
+
+> "Tastes sour and bone dry, with grapefruit flavors. colour_white"
+
+Prediction: `r round(predict(xgb, map_to_dtm(filter(wine, index == 78883)$description)), digits = 2)` points
+
+--
+> "Tastes and bone dry with grapefruit flavors. colour_white"
+
+Prediction: `r round(predict(xgb, map_to_dtm("Tastes and bone dry with grapefruit flavors. colour_white")), digits = 2)` points
+
+--
+> "Tastes sour and bone dry, with grapefruit flavors."
+
+Prediction: `r round(predict(xgb, map_to_dtm("Tastes sour and bone dry with grapefruit flavors")), digits = 2)` points
 
 ---
 ## LIME

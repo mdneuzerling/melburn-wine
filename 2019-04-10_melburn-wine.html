@@ -405,11 +405,16 @@ I want to include `colour` as a predictor, so I'm going to stick it onto the end
 
 ```r
 wine &lt;- wine %&gt;% 
-  mutate(description = paste0(description, " colour_", colour))
+  mutate(
+    description = case_when(
+      colour == "red" ~ description, # defined by absence
+      TRUE ~ paste0(description, " colour_", colour)
+    )
+  )
 paste0("&gt; ", wine$description[12412]) %&gt;% cat
 ```
 
-&gt; Made in a soft, fruity style, this darkly colored wine brims with complex flavors of blackberries, red licorice, grilled prosciutto, coffee, black pepper and sandalwood. Drink with steaks, chops and stews. colour_red
+&gt; Made in a soft, fruity style, this darkly colored wine brims with complex flavors of blackberries, red licorice, grilled prosciutto, coffee, black pepper and sandalwood. Drink with steaks, chops and stews.
 
 Let's prepare our train and test sets:
 
@@ -522,11 +527,11 @@ vocabulary
 ##   4:      brambl       1053      1049
 ##   5:      friend       1062      1051
 ##  ---                                 
+## 368:       palat      31027     30379
 ## 369:        acid      31702     30714
 ## 370:      finish      32433     32118
 ## 371:       aroma      32913     32473
 ## 372: colour_whit      37342     37342
-## 373:    colour_r      63681     63681
 ```
 ]
 
@@ -534,7 +539,7 @@ vocabulary
 class: inverse
 ## Vectoriser
 
-Our `vectoriser` will take an arbitrary string and map it to these 373 stemmed terms. 
+Our `vectoriser` will take an arbitrary string and map it to these 372 stemmed terms. 
 
 Any new terms will be **ignored**.
 
@@ -546,7 +551,7 @@ vectoriser &lt;- vocabulary %&gt;% text2vec::vocab_vectorizer()
 ---
 ## Document term matrices
 
-* Every column is one of our 373 terms
+* Every column is one of our 372 terms
 * Every row is a wine review
 * Values are weighted by *term frequency–inverse document frequency (tf-idf)*
 
@@ -559,7 +564,7 @@ dim(wine_train_dtm)
 ```
 
 ```
-## [1] 103978    373
+## [1] 103978    372
 ```
 
 ---
@@ -578,14 +583,14 @@ tail(as.matrix(wine_train_dtm)[1,], 21)
 ```
 
 ```
-##        plum        nose         oak       berri         red       fresh 
-##  0.00000000  0.00000000  0.00000000  0.14255269  0.13564472  0.00000000 
-##        rich       spice        note         dri       black        ripe 
-##  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.11145319 
-##      tannin      cherri       drink       palat        acid      finish 
-##  0.10012731  0.00000000  0.00000000  0.00000000  0.08710201  0.00000000 
-##       aroma colour_whit    colour_r 
-##  0.00000000  0.00000000  0.03501981
+##       light        plum        nose         oak       berri         red 
+##  0.00000000  0.00000000  0.00000000  0.00000000  0.15351828  0.14607893 
+##       fresh        rich       spice        note         dri       black 
+##  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000 
+##        ripe      tannin      cherri       drink       palat        acid 
+##  0.12002651  0.10782941  0.00000000  0.00000000  0.00000000  0.09380217 
+##      finish       aroma colour_whit 
+##  0.00000000  0.00000000  0.00000000
 ```
 
 ---
@@ -635,7 +640,7 @@ caret::postResample(wine_test_preds, wine_test$points)
 
 ```
 ##      RMSE  Rsquared       MAE 
-## 2.0794359 0.5482896 1.6341324
+## 2.0949501 0.5414494 1.6484374
 ```
 
 ---
@@ -716,6 +721,26 @@ lime::plot_image_explanation(example_image_explanation)
 
 &lt;img src="2019-04-10_melburn-wine_files/figure-html/example_image_explanation-1.png" width="1000" height="400" /&gt;
 
+## LIME
+---
+## Permutations
+
+### Wine 78883, 80 points
+
+&gt; "Tastes sour and bone dry, with grapefruit flavors. colour_white"
+
+Prediction: 82.48 points
+
+--
+&gt; "Tastes and bone dry with grapefruit flavors. colour_white"
+
+Prediction: 84.3 points
+
+--
+&gt; "Tastes sour and bone dry, with grapefruit flavors."
+
+Prediction: 84.33 points
+
 ---
 ## LIME
 
@@ -735,7 +760,7 @@ wine_explainer &lt;- lime::lime(
 
 .pull-left[
 
-&gt; Oak completely overwhelms this wine. All you can smell and taste is char, caramel and wood spice, and the tannins, which are partly from oak barrels, are dense and hard. It's difficult even to discern any underlying fruit flavors, although if you try hard, you stumble across blackberries. colour_red
+&gt; Oak completely overwhelms this wine. All you can smell and taste is char, caramel and wood spice, and the tannins, which are partly from oak barrels, are dense and hard. It's difficult even to discern any underlying fruit flavors, although if you try hard, you stumble across blackberries.
 
 
 ```r
@@ -780,7 +805,7 @@ custom_lime_explanation_plot(
 
 .pull-left[
 
-&gt; It takes only a few moments before you appreciate the enormity, intensity and overall beauty of this landmark wine. Cerretalto is always a high scoring expression of Brunello, but the ideal conditions of the 2007 vintage elevate it to earthly perfection. Dark and fleshy, the wine delivers ever-evolving aromas of dark fruit, chocolate, spice and tobacco. The acidity is carefully balanced against the wine's thickness and rich texture. The finish is long, luscious and elegant. Keep this bottle in your cellar 10 years or more. colour_red
+&gt; It takes only a few moments before you appreciate the enormity, intensity and overall beauty of this landmark wine. Cerretalto is always a high scoring expression of Brunello, but the ideal conditions of the 2007 vintage elevate it to earthly perfection. Dark and fleshy, the wine delivers ever-evolving aromas of dark fruit, chocolate, spice and tobacco. The acidity is carefully balanced against the wine's thickness and rich texture. The finish is long, luscious and elegant. Keep this bottle in your cellar 10 years or more.
 
 
 
@@ -796,7 +821,7 @@ custom_lime_explanation_plot(
 
 .pull-left[
 
-&gt; Rubbery, animal-like aromas are low on fruit. The palate is shrill and dominated by sharp acidity. Sour, herbal and pinched tasting, this is tart and green overall. colour_red
+&gt; Rubbery, animal-like aromas are low on fruit. The palate is shrill and dominated by sharp acidity. Sour, herbal and pinched tasting, this is tart and green overall.
 
 
 
@@ -877,8 +902,8 @@ cm$table
 ```
 ##           Reference
 ## Prediction     0     1
-##          0 11742  1969
-##          1  4044  8238
+##          0 11781  1930
+##          1  4158  8124
 ```
 
 
@@ -887,7 +912,7 @@ scales::percent(cm$overall[["Accuracy"]])
 ```
 
 ```
-## [1] "76.9%"
+## [1] "76.6%"
 ```
 ]
 
