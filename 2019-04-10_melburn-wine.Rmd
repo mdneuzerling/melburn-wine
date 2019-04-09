@@ -558,6 +558,18 @@ class: inverse
 ---
 ## LIME
 
+* Original paper: [https://arxiv.org/abs/1602.04938](https://arxiv.org/abs/1602.04938)
+* R package: [https://github.com/thomasp85/lime](https://github.com/thomasp85/lime)
+* Python module: [https://github.com/marcotcr/lime](https://github.com/marcotcr/lime)
+
+<center>
+<img src="lime-paper.png" alt="A screenshot of a portion of the front page of the arxiv article linked above." style="width: 70%; height: 70%;"></img>
+</center>
+
+
+---
+## LIME
+
 LIME doesn't care about non-linear models, it just needs things to be *locally linear*:
 
 <center>
