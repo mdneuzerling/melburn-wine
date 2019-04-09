@@ -401,25 +401,10 @@ wine_2grams %&gt;%
 ---
 ## Train and test
 
-I want to include `colour` as a predictor, so I'm going to stick it onto the end of the `description`.
+We're about to do some modelling. Let's prepare our train and test sets:
 
 ```r
-wine &lt;- wine %&gt;% 
-  mutate(
-    description = case_when(
-      colour == "red" ~ description, # defined by absence
-      TRUE ~ paste0(description, " colour_", colour)
-    )
-  )
-paste0("&gt; ", wine$description[12412]) %&gt;% cat
-```
-
-&gt; Made in a soft, fruity style, this darkly colored wine brims with complex flavors of blackberries, red licorice, grilled prosciutto, coffee, black pepper and sandalwood. Drink with steaks, chops and stews.
-
-Let's prepare our train and test sets:
-
-```r
-wine_split &lt;- rsample::initial_split(wine, strata = "colour", p = 0.80)
+wine_split &lt;- rsample::initial_split(wine, p = 0.80)
 wine_train &lt;- rsample::training(wine_split)
 wine_test &lt;- rsample::testing(wine_split)
 ```
@@ -516,22 +501,22 @@ vocabulary
 ```
 
 ```
-## Number of docs: 103978 
+## Number of docs: 103977 
 ## 1153 stopwords: a, a's, able, about, above, according ... 
 ## ngram_min = 1; ngram_max = 1 
 ## Vocabulary: 
-##             term term_count doc_count
-##   1:  underbrush       1040      1040
-##   2:   highlight       1046      1043
-##   3:       anoth       1052      1044
-##   4:      brambl       1053      1049
-##   5:      friend       1062      1051
-##  ---                                 
-## 368:       palat      31027     30379
-## 369:        acid      31702     30714
-## 370:      finish      32433     32118
-## 371:       aroma      32913     32473
-## 372: colour_whit      37342     37342
+##          term term_count doc_count
+##   1:    boast       1045      1042
+##   2:   brambl       1051      1048
+##   3:  graphit       1055      1050
+##   4: pomegran       1063      1042
+##   5:   featur       1064      1063
+##  ---                              
+## 362:    drink      27353     26774
+## 363:    palat      30899     30222
+## 364:     acid      31878     30886
+## 365:   finish      32266     31960
+## 366:    aroma      32777     32332
 ```
 ]
 
@@ -539,7 +524,7 @@ vocabulary
 class: inverse
 ## Vectoriser
 
-Our `vectoriser` will take an arbitrary string and map it to these 372 stemmed terms. 
+Our `vectoriser` will take an arbitrary string and map it to these 366 stemmed terms. 
 
 Any new terms will be **ignored**.
 
@@ -551,7 +536,7 @@ vectoriser &lt;- vocabulary %&gt;% text2vec::vocab_vectorizer()
 ---
 ## Document term matrices
 
-* Every column is one of our 372 terms
+* Every column is one of our 366 terms
 * Every row is a wine review
 * Values are weighted by *term frequency–inverse document frequency (tf-idf)*
 
@@ -564,7 +549,7 @@ dim(wine_train_dtm)
 ```
 
 ```
-## [1] 103978    372
+## [1] 103977    366
 ```
 
 ---
@@ -575,7 +560,7 @@ dim(wine_train_dtm)
 paste0('&gt; ', wine[1,]$description) %&gt;% cat
 ```
 
-&gt; Aromas include tropical fruit, broom, brimstone and dried herb. The palate isn't overly expressive, offering unripened apple, citrus and dried sage alongside brisk acidity. colour_white
+&gt; Aromas include tropical fruit, broom, brimstone and dried herb. The palate isn't overly expressive, offering unripened apple, citrus and dried sage alongside brisk acidity.
 
 
 ```r
@@ -583,14 +568,14 @@ tail(as.matrix(wine_train_dtm)[1,], 21)
 ```
 
 ```
-##       light        plum        nose         oak       berri         red 
-##  0.00000000  0.00000000  0.00000000  0.00000000  0.15351828  0.14607893 
-##       fresh        rich       spice        note         dri       black 
-##  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000 
-##        ripe      tannin      cherri       drink       palat        acid 
-##  0.12002651  0.10782941  0.00000000  0.00000000  0.00000000  0.09380217 
-##      finish       aroma colour_whit 
-##  0.00000000  0.00000000  0.00000000
+##      offer       plum      light       nose        oak      berri 
+## 0.14049216 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 
+##        red      fresh       rich      spice       note        dri 
+## 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.22228822 
+##      black       ripe     tannin     cherri      drink      palat 
+## 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.08237110 
+##       acid     finish      aroma 
+## 0.08092229 0.00000000 0.07787209
 ```
 
 ---
@@ -640,7 +625,7 @@ caret::postResample(wine_test_preds, wine_test$points)
 
 ```
 ##      RMSE  Rsquared       MAE 
-## 2.0949501 0.5414494 1.6484374
+## 2.1059337 0.5379716 1.6511223
 ```
 
 ---
@@ -727,19 +712,38 @@ lime::plot_image_explanation(example_image_explanation)
 
 ### Wine 78883, 80 points
 
-&gt; "Tastes sour and bone dry, with grapefruit flavors. colour_white"
-
-Prediction: 82.48 points
-
---
-&gt; "Tastes and bone dry with grapefruit flavors. colour_white"
-
-Prediction: 84.3 points
-
---
 &gt; "Tastes sour and bone dry, with grapefruit flavors."
 
-Prediction: 84.33 points
+Prediction: 83.81 points
+
+--
+&gt; "Tastes sour and bone dry, with ~~grapefruit~~ flavors."
+
+Prediction: 83.81 points
+
+--
+&gt; "Tastes ~~sour~~ and bone dry with grapefruit flavors."
+
+Prediction: 86.11 points
+
+--
+&gt; "Tastes ~~sour~~ and bone ~~dry~~, with grapefruit flavors."
+
+Prediction: 87.3 points
+
+---
+## Permutations
+
+### Wine 84890, 86 points
+
+&gt; "This is certainly dry, as stated, but it doesn't have the texture and stuffing that the best dry Rieslings bring to the show. Simple and straightforward lemon and grapefruit flavors tell the whole story, and those high acids leave a sour impression."
+
+Prediction: 85.57 points
+
+--
+&gt; "This is certainly dry, as stated, but it doesn't have the texture and stuffing that the best dry Rieslings bring to the show. Simple and straightforward lemon and ~~grapefruit~~ flavors tell the whole story, and those high acids leave a sour impression."
+
+Prediction: 84.36 points
 
 ---
 ## LIME
@@ -789,7 +793,7 @@ custom_lime_explanation_plot(
 
 .pull-left[
 
-&gt; Picked at 33 brix and fermented in new French oak, this heavy, almost oily dessert wine has a floral aroma as intense as bottled perfume. Flavors suggest orange liqueur, honey and candied apricots. It pulls together just enough acidity to avoid falling into a fat, cloying finish. colour_white
+&gt; Picked at 33 brix and fermented in new French oak, this heavy, almost oily dessert wine has a floral aroma as intense as bottled perfume. Flavors suggest orange liqueur, honey and candied apricots. It pulls together just enough acidity to avoid falling into a fat, cloying finish.
 
 
 
@@ -902,8 +906,8 @@ cm$table
 ```
 ##           Reference
 ## Prediction     0     1
-##          0 11781  1930
-##          1  4158  8124
+##          0 11764  1853
+##          1  4182  8195
 ```
 
 
@@ -912,7 +916,7 @@ scales::percent(cm$overall[["Accuracy"]])
 ```
 
 ```
-## [1] "76.6%"
+## [1] "76.8%"
 ```
 ]
 

@@ -314,21 +314,9 @@ wine_2grams %>%
 ---
 ## Train and test
 
-I want to include `colour` as a predictor, so I'm going to stick it onto the end of the `description`.
-```{r adding_some_colour, results='asis'}
-wine <- wine %>% 
-  mutate(
-    description = case_when(
-      colour == "red" ~ description, # defined by absence
-      TRUE ~ paste0(description, " colour_", colour)
-    )
-  )
-paste0("> ", wine$description[12412]) %>% cat
-```
-
-Let's prepare our train and test sets:
+We're about to do some modelling. Let's prepare our train and test sets:
 ```{r wine_split}
-wine_split <- rsample::initial_split(wine, strata = "colour", p = 0.80)
+wine_split <- rsample::initial_split(wine, p = 0.80)
 wine_train <- rsample::training(wine_split)
 wine_test <- rsample::testing(wine_split)
 ```
@@ -592,19 +580,38 @@ lime::plot_image_explanation(example_image_explanation)
 
 ### Wine 78883, 80 points
 
-> "Tastes sour and bone dry, with grapefruit flavors. colour_white"
+> "Tastes sour and bone dry, with grapefruit flavors."
 
 Prediction: `r round(predict(xgb, map_to_dtm(filter(wine, index == 78883)$description)), digits = 2)` points
 
 --
-> "Tastes and bone dry with grapefruit flavors. colour_white"
+> "Tastes sour and bone dry, with ~~grapefruit~~ flavors."
 
-Prediction: `r round(predict(xgb, map_to_dtm("Tastes and bone dry with grapefruit flavors. colour_white")), digits = 2)` points
+Prediction: `r round(predict(xgb, map_to_dtm("Tastes sour and bone dry, with flavors.")), digits = 2)` points
 
 --
-> "Tastes sour and bone dry, with grapefruit flavors."
+> "Tastes ~~sour~~ and bone dry with grapefruit flavors."
 
-Prediction: `r round(predict(xgb, map_to_dtm("Tastes sour and bone dry with grapefruit flavors")), digits = 2)` points
+Prediction: `r round(predict(xgb, map_to_dtm("Tastes and bone dry with grapefruit flavors.")), digits = 2)` points
+
+--
+> "Tastes ~~sour~~ and bone ~~dry~~, with grapefruit flavors."
+
+Prediction: `r round(predict(xgb, map_to_dtm("Tastes and bone, with grapefruit flavors.")), digits = 2)` points
+
+---
+## Permutations
+
+### Wine 84890, 86 points
+
+> "This is certainly dry, as stated, but it doesn't have the texture and stuffing that the best dry Rieslings bring to the show. Simple and straightforward lemon and grapefruit flavors tell the whole story, and those high acids leave a sour impression."
+
+Prediction: `r round(predict(xgb, map_to_dtm(filter(wine, index == 84890)$description)), digits = 2)` points
+
+--
+> "This is certainly dry, as stated, but it doesn't have the texture and stuffing that the best dry Rieslings bring to the show. Simple and straightforward lemon and ~~grapefruit~~ flavors tell the whole story, and those high acids leave a sour impression."
+
+Prediction: `r round(predict(xgb, map_to_dtm(gsub("grapefruit", "", filter(wine, index == 84890)$description))), digits = 2)` points
 
 ---
 ## LIME
