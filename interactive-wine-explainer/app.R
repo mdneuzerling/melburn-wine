@@ -1,14 +1,6 @@
 library(shiny)
 library(lime)
 
-vectoriser <- readr::read_rds("vectoriser.rds")
-tfidf <- readr::read_rds("tfidf.rds")
-stem_tokeniser <- readr::read_rds("stem_tokeniser.rds")
-map_to_dtm <- readr::read_rds("map_to_dtm.rds")
-explainer <- readr::read_rds("wine_classification_explainer.rds")
-
-shared_states <- list()
-
 feature_selection_strategy <- local({
     strategies <- c("auto", "none", "forward_selection", "highest_weights",
                     "lasso_path", "tree")
@@ -59,6 +51,15 @@ ui <- fluidPage(
 server <- function(input, output) {
     library(shiny)
     library(lime)
+    
+    load(file = "stem_tokeniser.rda", .GlobalEnv)
+    load(file = "vectoriser.rda", .GlobalEnv)
+    load(file = "tfidf.rda", .GlobalEnv)
+    load(file = "map_to_dtm.rda", .GlobalEnv)
+    load(file = "wine_classification_explainer.rda", .GlobalEnv)
+    
+    shared_states <- list()
+    
     output$text_explanations_plot <- render_text_explanations({
         validate(
             need(
@@ -68,7 +69,7 @@ server <- function(input, output) {
         )
         shared_states$explanations <<- lime::explain(
             input$text_to_explain, 
-            explainer, 
+            wine_classification_explainer, 
             n_labels = 1, 
             n_features = input$number_features_to_explain, 
             feature_select = input$feature_selection_strategy, 
