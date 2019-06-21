@@ -896,3 +896,4 @@ lime::interactive_text_explanations(wine_classification_explainer)
 <!-- stem_tokeniser %>% readr::write_rds("stem_tokeniser.rds") -->
 <!-- map_to_dtm %>% readr::write_rds("map_to_dtm.rds") -->
 <!-- wine_classification_explainer %>% readr::write_rds("wine_classification_explainer.rds") -->
+<!-- xgb_classification %>% readr::write_rds("xgb_classification.rds") -->
